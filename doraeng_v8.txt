@@ -1,0 +1,1757 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DORA & MaRisk — Decision Tree</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:ital,wght@0,300;0,400;0,600;0,700;1,300&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #0a0e1a;
+    --surface: #111827;
+    --surface2: #1a2236;
+    --border: #1e2d45;
+    --accent: #00d4ff;
+    --accent2: #ff6b35;
+    --accent3: #00ff88;
+    --accent4: #ffd700;
+    --text: #e2e8f0;
+    --text-dim: #64748b;
+    --text-mid: #94a3b8;
+    --marisk-color: #818cf8;
+    --dora-color: #00d4ff;
+    --eba-color: #34d399;
+    --critical: #f87171;
+    --warning: #fbbf24;
+  }
+
+  body {
+    font-family: 'IBM Plex Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* Background grid */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(0,212,255,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,212,255,0.03) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .container {
+    position: relative;
+    z-index: 1;
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 40px 24px 80px;
+  }
+
+  /* HEADER */
+  header {
+    margin-bottom: 48px;
+    padding-bottom: 32px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .header-tag {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    color: var(--accent);
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+
+  h1 {
+    font-size: clamp(28px, 5vw, 42px);
+    font-weight: 700;
+    line-height: 1.1;
+    color: #fff;
+    margin-bottom: 8px;
+  }
+
+  h1 span { color: var(--accent); }
+
+  .subtitle {
+    font-size: 15px;
+    color: var(--text-mid);
+    font-weight: 300;
+    margin-bottom: 20px;
+  }
+
+  .legend {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+  }
+
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    color: var(--text-dim);
+  }
+
+  .legal-refs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px solid var(--border);
+  }
+
+  .legal-ref {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 1px;
+    color: var(--text-dim);
+    background: rgba(255,255,255,0.03);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 3px 10px;
+  }
+
+  .legend-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+  }
+
+  /* PROGRESS BAR */
+  .progress-bar {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    height: 4px;
+    margin-bottom: 40px;
+    overflow: hidden;
+  }
+
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent), var(--accent3));
+    border-radius: 4px;
+    transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    width: 0%;
+  }
+
+  /* BREADCRUMB */
+  .breadcrumb {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    color: var(--text-dim);
+    margin-bottom: 32px;
+    min-height: 20px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+
+  .breadcrumb-item { color: var(--text-dim); }
+  .breadcrumb-item.active { color: var(--accent); }
+  .breadcrumb-sep { color: var(--border); }
+
+  /* QUESTION CARD */
+  .question-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 36px;
+    margin-bottom: 24px;
+    position: relative;
+    overflow: hidden;
+    animation: slideIn 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .question-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, var(--accent), transparent);
+  }
+
+  @keyframes slideIn {
+    from { opacity: 0; transform: translateY(16px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .step-label {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    color: var(--accent);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 16px;
+  }
+
+  .question-text {
+    font-size: 20px;
+    font-weight: 600;
+    color: #fff;
+    line-height: 1.4;
+    margin-bottom: 12px;
+  }
+
+  .question-hint {
+    font-size: 13px;
+    color: var(--text-dim);
+    font-style: italic;
+    line-height: 1.6;
+    margin-bottom: 28px;
+    padding: 12px 16px;
+    background: rgba(255,255,255,0.03);
+    border-left: 2px solid var(--border);
+    border-radius: 0 6px 6px 0;
+  }
+
+  .question-hint strong { color: var(--text-mid); font-style: normal; }
+
+  /* ANSWER BUTTONS */
+  .answers {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .answer-btn {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 16px 20px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-align: left;
+    width: 100%;
+    color: var(--text);
+    font-family: 'IBM Plex Sans', sans-serif;
+  }
+
+  .answer-btn:hover {
+    border-color: var(--accent);
+    background: rgba(0, 212, 255, 0.06);
+    transform: translateX(4px);
+  }
+
+  .answer-btn.yes:hover { border-color: var(--accent3); background: rgba(0,255,136,0.06); }
+  .answer-btn.no:hover { border-color: var(--accent2); background: rgba(255,107,53,0.06); }
+
+  .answer-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 13px;
+    font-weight: 600;
+  }
+
+  .answer-btn.yes .answer-icon { background: rgba(0,255,136,0.15); color: var(--accent3); }
+  .answer-btn.no .answer-icon { background: rgba(255,107,53,0.15); color: var(--accent2); }
+  .answer-btn.maybe .answer-icon { background: rgba(255,215,0,0.15); color: var(--accent4); }
+
+  .answer-label { font-size: 15px; font-weight: 600; }
+  .answer-sublabel { font-size: 12px; color: var(--text-dim); margin-top: 2px; }
+
+  /* RESULT CARD */
+  .result-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 36px;
+    animation: slideIn 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .result-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 12px;
+    padding: 1px;
+    background: linear-gradient(135deg, var(--accent3), var(--accent), transparent);
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
+  }
+
+  .result-title {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--accent3);
+    margin-bottom: 20px;
+  }
+
+  .classification-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 12px;
+    margin-bottom: 28px;
+  }
+
+  .class-badge {
+    padding: 16px;
+    border-radius: 8px;
+    border: 1px solid;
+  }
+
+  .class-badge.marisk {
+    border-color: rgba(129,140,248,0.3);
+    background: rgba(129,140,248,0.08);
+  }
+  .class-badge.dora {
+    border-color: rgba(0,212,255,0.3);
+    background: rgba(0,212,255,0.08);
+  }
+  .class-badge.eba {
+    border-color: rgba(52,211,153,0.3);
+    background: rgba(52,211,153,0.08);
+  }
+
+  .class-badge-label {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+  .class-badge.marisk .class-badge-label { color: var(--marisk-color); }
+  .class-badge.dora .class-badge-label { color: var(--dora-color); }
+  .class-badge.eba .class-badge-label { color: var(--eba-color); }
+
+  .class-badge-value {
+    font-size: 14px;
+    font-weight: 600;
+    color: #fff;
+    line-height: 1.3;
+  }
+
+  .implications-title {
+    font-weight: 600;
+    color: var(--text-mid);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 12px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+  }
+
+  .implication-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 28px;
+  }
+
+  .implication-list li {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    font-size: 14px;
+    color: var(--text-mid);
+    line-height: 1.5;
+  }
+
+  .implication-list li::before {
+    content: '→';
+    color: var(--accent);
+    font-family: 'IBM Plex Mono', monospace;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+
+  .examples-box {
+    background: rgba(255,255,255,0.02);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px 20px;
+    margin-bottom: 28px;
+  }
+
+  .examples-title {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 2px;
+    color: var(--accent4);
+    margin-bottom: 10px;
+    text-transform: uppercase;
+  }
+
+  .examples-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .example-tag {
+    background: rgba(255,215,0,0.08);
+    border: 1px solid rgba(255,215,0,0.2);
+    border-radius: 4px;
+    padding: 4px 10px;
+    font-size: 12px;
+    color: var(--accent4);
+    font-family: 'IBM Plex Mono', monospace;
+  }
+
+  /* BUTTONS */
+  .btn-group {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+
+  .btn {
+    padding: 12px 24px;
+    border-radius: 6px;
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    border: none;
+  }
+
+  .btn-primary {
+    background: var(--accent);
+    color: #000;
+  }
+  .btn-primary:hover { background: #33ddff; transform: translateY(-1px); }
+
+  .btn-secondary {
+    background: transparent;
+    color: var(--text-mid);
+    border: 1px solid var(--border);
+  }
+  .btn-secondary:hover { border-color: var(--text-mid); color: var(--text); }
+
+  /* BACK BUTTON */
+  .back-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: none;
+    border: none;
+    color: var(--text-dim);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    cursor: pointer;
+    padding: 0;
+    margin-bottom: 20px;
+    transition: color 0.2s;
+  }
+  .back-btn:hover { color: var(--text-mid); }
+  .back-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+
+  /* ALERT */
+  .alert {
+    display: flex;
+    gap: 12px;
+    padding: 14px 16px;
+    border-radius: 6px;
+    margin-bottom: 16px;
+    font-size: 13px;
+    line-height: 1.5;
+  }
+  .alert-warning {
+    background: rgba(251,191,36,0.08);
+    border: 1px solid rgba(251,191,36,0.25);
+    color: var(--warning);
+  }
+  .alert-critical {
+    background: rgba(248,113,113,0.08);
+    border: 1px solid rgba(248,113,113,0.25);
+    color: var(--critical);
+  }
+  .alert-icon { flex-shrink: 0; font-size: 16px; }
+
+  /* RESTART */
+  .restart-area {
+    margin-top: 32px;
+    padding-top: 24px;
+    border-top: 1px solid var(--border);
+  }
+
+  @media (max-width: 600px) {
+    .question-card, .result-card { padding: 24px 20px; }
+    .classification-grid { grid-template-columns: 1fr; }
+  }
+
+  /* TIMELINE BANNER */
+  .timeline-banner {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: rgba(0,212,255,0.06);
+    border: 1px solid rgba(0,212,255,0.2);
+    border-radius: 8px;
+    padding: 12px 16px;
+    margin-bottom: 24px;
+    font-size: 13px;
+    color: var(--accent);
+  }
+  .timeline-banner .tl-icon {
+    font-size: 18px;
+    flex-shrink: 0;
+  }
+  .timeline-banner strong {
+    color: #fff;
+    font-weight: 600;
+  }
+
+  /* CHECKLIST */
+  .checklist-section {
+    margin-bottom: 28px;
+  }
+  .checklist-title {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--accent4);
+    margin-bottom: 12px;
+  }
+  .checklist {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  .checklist-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 11px 16px;
+    border-bottom: 1px solid var(--border);
+    font-size: 13px;
+    color: var(--text-mid);
+    line-height: 1.5;
+    background: rgba(255,255,255,0.01);
+    transition: background 0.15s;
+  }
+  .checklist-item:last-child { border-bottom: none; }
+  .checklist-item:hover { background: rgba(255,255,255,0.03); }
+  .checklist-item input[type="checkbox"] {
+    accent-color: var(--accent3);
+    width: 15px;
+    height: 15px;
+    flex-shrink: 0;
+    margin-top: 2px;
+    cursor: pointer;
+  }
+  .checklist-item label {
+    cursor: pointer;
+    flex: 1;
+  }
+  .checklist-item input:checked + label {
+    text-decoration: line-through;
+    color: var(--text-dim);
+  }
+  .checklist-item .ci-tag {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 9px;
+    padding: 2px 6px;
+    border-radius: 3px;
+    flex-shrink: 0;
+    margin-top: 3px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+  .ci-tag.legal { background: rgba(129,140,248,0.15); color: var(--marisk-color); }
+  .ci-tag.risk { background: rgba(248,113,113,0.15); color: var(--critical); }
+  .ci-tag.ops { background: rgba(0,255,136,0.12); color: var(--accent3); }
+  .ci-tag.mgmt { background: rgba(255,215,0,0.12); color: var(--accent4); }
+
+  /* CTPP FLAG */
+  .ctpp-flag {
+    display: flex;
+    gap: 14px;
+    background: rgba(255,107,53,0.07);
+    border: 1px solid rgba(255,107,53,0.35);
+    border-radius: 8px;
+    padding: 14px 16px;
+    margin-bottom: 16px;
+  }
+  .ctpp-flag-icon { font-size: 20px; flex-shrink: 0; }
+  .ctpp-flag-body { flex: 1; }
+  .ctpp-flag-title {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--accent2);
+    margin-bottom: 6px;
+  }
+  .ctpp-flag-text { font-size: 13px; color: var(--text-mid); line-height: 1.6; }
+  .ctpp-flag-text strong { color: var(--accent2); }
+
+  /* BAFIN FLAG */
+  .bafin-flag {
+    display: flex;
+    gap: 14px;
+    background: rgba(129,140,248,0.07);
+    border: 1px solid rgba(129,140,248,0.3);
+    border-radius: 8px;
+    padding: 14px 16px;
+    margin-bottom: 24px;
+  }
+  .bafin-flag-icon { font-size: 20px; flex-shrink: 0; }
+  .bafin-flag-body { flex: 1; }
+  .bafin-flag-title {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--marisk-color);
+    margin-bottom: 6px;
+  }
+  .bafin-flag-text { font-size: 13px; color: var(--text-mid); line-height: 1.6; }
+  .bafin-flag-text strong { color: #c7d2fe; }
+
+  /* LANDING SCREEN */
+  .landing-screen {
+    animation: slideIn 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .landing-intro {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 36px;
+    margin-bottom: 20px;
+    position: relative;
+    overflow: hidden;
+  }
+  .landing-intro::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, var(--accent), var(--accent3), transparent);
+  }
+  .landing-intro-label {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 14px;
+  }
+  .landing-intro-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 10px;
+  }
+  .landing-intro-text {
+    font-size: 13px;
+    color: var(--text-dim);
+    line-height: 1.7;
+  }
+
+  .landing-question-label {
+    font-size: 16px;
+    font-weight: 700;
+    color: #fff;
+    margin: 24px 0 14px;
+  }
+  .landing-choice-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    margin-top: 8px;
+  }
+  @media (max-width: 600px) { .landing-choice-grid { grid-template-columns: 1fr; } }
+  .landing-choice-btn {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 24px 20px;
+    cursor: pointer;
+    text-align: left;
+    transition: all 0.2s;
+    color: var(--text);
+    font-family: 'IBM Plex Sans', sans-serif;
+    position: relative;
+    overflow: hidden;
+  }
+  .landing-choice-btn:hover {
+    border-color: var(--accent);
+    background: rgba(0,212,255,0.05);
+    transform: translateY(-2px);
+  }
+  .landing-choice-btn.reassess:hover {
+    border-color: var(--marisk-color);
+    background: rgba(129,140,248,0.05);
+  }
+  .landing-choice-icon {
+    font-size: 28px;
+    margin-bottom: 12px;
+    display: block;
+  }
+  .landing-choice-title {
+    font-size: 15px;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 6px;
+  }
+  .landing-choice-desc {
+    font-size: 12px;
+    color: var(--text-dim);
+    line-height: 1.5;
+  }
+  .landing-choice-tag {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-top: 10px;
+    display: inline-block;
+    padding: 3px 8px;
+    border-radius: 3px;
+  }
+  .landing-choice-btn:not(.reassess) .landing-choice-tag {
+    background: rgba(0,212,255,0.12);
+    color: var(--accent);
+  }
+  .landing-choice-btn.reassess .landing-choice-tag {
+    background: rgba(129,140,248,0.12);
+    color: var(--marisk-color);
+  }
+
+  /* BAFIN STEPS */
+  .bafin-steps {
+    margin-top: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .bafin-step {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+  }
+  .bafin-step-num {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    font-weight: 700;
+    background: rgba(129,140,248,0.2);
+    color: var(--marisk-color);
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+  .bafin-step-text { font-size: 13px; color: var(--text-mid); line-height: 1.5; }
+  .bafin-step-text strong { color: #c7d2fe; }
+</style>
+</head>
+<body>
+<div class="container">
+  <header>
+    <div class="header-tag">Classification tool</div>
+    <h1>MaRisk · DORA · <span>EBA GL</span></h1>
+    <p class="subtitle">Interactive decision tree for classifying external services and arrangements</p>
+    <div class="legend">
+      <div class="legend-item"><div class="legend-dot" style="background:var(--marisk-color)"></div> MaRisk AT 9</div>
+      <div class="legend-item"><div class="legend-dot" style="background:var(--dora-color)"></div> DORA EU 2022/2554</div>
+      <div class="legend-item"><div class="legend-dot" style="background:var(--eba-color)"></div> EBA/GL/2019/02</div>
+    </div>
+    <div class="legal-refs">
+      <span class="legal-ref">DORA Art. 28</span>
+      <span class="legal-ref">DORA Art. 30</span>
+      <span class="legal-ref">MaRisk AT 9</span>
+      <span class="legal-ref">§ 25b KWG</span>
+      <span class="legal-ref">EBA/GL/2019/02</span>
+      <span class="legal-ref">RTS 2024/1773</span>
+    </div>
+  </header>
+
+  <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+  <div class="breadcrumb" id="breadcrumb"></div>
+
+  <button class="back-btn" id="backBtn" onclick="goBack()" disabled>← back</button>
+
+  <div id="treeContainer"></div>
+</div>
+
+<script>
+const tree = {
+  id: 'start',
+  step: 'STEP 1 / 7',
+  question: 'Is the service/activity ICT (Information & Communications Technology) in nature?',
+  hint: '<strong>ICT services</strong> include: software-as-a-service, cloud hosting, data centres, network services, IT security, development, payment processing, core banking systems, market data feeds. <br><br><strong>Not ICT:</strong> physical security, cleaning, printing (without system access), consulting (without system access), facility management.',
+  answers: [
+    {
+      label: 'YES — ICT service',
+      sublabel: 'The service involves IT systems, software, data, or networks',
+      type: 'yes',
+      next: 'q2_ict'
+    },
+    {
+      label: 'NO — Not ICT',
+      sublabel: 'Physical service, consulting without system access, etc.',
+      type: 'no',
+      next: 'q_non_ict'
+    }
+  ]
+};
+
+const nodes = {
+  'q2_ict': {
+    step: 'STEP 2 / 8',
+    question: 'Is this service cloud-based (hosted by a third-party cloud provider)?',
+    hint: '<strong>Any third-party cloud = outsourcing trigger under MaRisk AT 9.</strong><br><br>This includes: public cloud (AWS, Azure, GCP), private cloud operated by a third party, hybrid cloud with external components, SaaS hosted on third-party infrastructure.<br><br><strong>Not cloud:</strong> software installed on the bank\'s own on-premise servers, bank-owned data centres.',
+    answers: [
+      { label: 'YES — cloud-based service', sublabel: 'Hosted on any third-party cloud infrastructure', type: 'yes', next: 'q3_cloud_cif' },
+      { label: 'NO — not cloud (on-premise or bank-owned)', sublabel: 'Bank controls the infrastructure', type: 'no', next: 'q2b_ict' }
+    ]
+  },
+
+  'q2b_ict': {
+    step: 'STEP 3 / 8',
+    question: 'Is this an activity the bank would normally perform itself, or would otherwise have to perform?',
+    hint: '<strong>Criterion:</strong> Without this vendor, would the bank need to hire people and build internal capability for this function? <br><br><strong>YES:</strong> core banking, risk systems, AML, payments, IT development, helpdesk <br><strong>NO:</strong> electricity, telecom infrastructure, standard software licences the bank could not build itself',
+    answers: [
+      { label: 'YES — the bank would do this itself', sublabel: 'Internal function transferred to a vendor', type: 'yes', next: 'q3_material' },
+      { label: 'NO — the bank would not do this itself', sublabel: 'Standard external product/service', type: 'no', next: 'q_fremdbezug_ict' }
+    ]
+  },
+
+  'q3_cloud_cif': {
+    step: 'STEP 3 / 8',
+    question: 'Does this cloud service support a critical or important function of the bank (CIF)?',
+    hint: '<strong>Cloud + CIF = Material outsourcing</strong> under MaRisk AT 9 — maximum DORA and EBA requirements apply.<br><br><strong>CIF examples:</strong> core banking hosted in cloud, payment processing, AML/KYC systems, trading platforms, customer-facing digital channels, risk engines.<br><br><strong>Not CIF:</strong> internal HR tools, non-critical analytics, developer tooling, internal communication platforms.',
+    answers: [
+      { label: 'YES — supports a CIF', sublabel: 'Cloud + critical function = material outsourcing', type: 'yes', next: 'q3b_cloud_ctpp' },
+      { label: 'NO — does not support a CIF', sublabel: 'Cloud but non-critical function', type: 'no', next: 'q3c_cloud_noncif' }
+    ]
+  },
+
+  'q3b_cloud_ctpp': {
+    step: 'STEP 4 / 8',
+    question: 'Is the provider within the same group (intra-group)?',
+    hint: '<strong>Intra-group</strong> means the provider belongs to the same conglomerate/holding/group as the bank. <br><br>Intra-group status <strong>does not exempt</strong> you from requirements — you still need a formal contract, SLA, audit rights, and exit plan.',
+    answers: [
+      { label: 'YES — intra-group cloud provider', sublabel: 'Group-owned cloud infrastructure', type: 'yes', next: 'q3d_cloud_intra_sub' },
+      { label: 'NO — external cloud provider', sublabel: 'Third-party cloud outside the group', type: 'no', next: 'q3e_cloud_ctpp_check' }
+    ]
+  },
+
+  'q3d_cloud_intra_sub': {
+    step: 'STEP 5 / 8',
+    question: 'Does the intra-group cloud provider use external sub-vendors for the critical function?',
+    hint: '<strong>Sub-outsourcing risk:</strong> Even if the cloud provider is intra-group, it may run on external cloud infrastructure (e.g. group IT company using AWS). You remain responsible for the whole chain.',
+    answers: [
+      { label: 'YES — sub-outsourcing to external cloud/vendor', sublabel: 'e.g. group entity running on AWS', type: 'yes', next: 'result_intragroup_sub' },
+      { label: 'NO — pure intra-group cloud', sublabel: 'No external cloud underneath', type: 'no', next: 'result_intragroup' }
+    ]
+  },
+
+  'q3e_cloud_ctpp_check': {
+    step: 'STEP 5 / 8',
+    question: 'Is this a major hyperscaler or potential CTPP (Critical Third-Party Provider)?',
+    hint: '<strong>CTPP designation</strong> is made by the ESAs (EBA, ESMA, EIOPA) — you don\'t decide it, but you must monitor it and assess concentration risk.<br><br><strong>Potential CTPPs:</strong> AWS, Microsoft Azure, Google Cloud, Oracle Cloud, IBM Cloud, Salesforce — any provider serving a large share of EU financial institutions.<br><br>Check the ESA CTPP list regularly.',
+    answers: [
+      { label: 'YES / POSSIBLY — major cloud or mega provider', sublabel: 'AWS, Azure, GCP, Oracle, Salesforce, etc.', type: 'yes', next: 'result_max' },
+      { label: 'NO — specialised cloud vendor', sublabel: 'Not a systemic hyperscaler', type: 'no', next: 'result_wesentlich_cif' }
+    ]
+  },
+
+  'q3c_cloud_noncif': {
+    step: 'STEP 4 / 8',
+    question: 'Does the cloud service have access to customer data or production systems?',
+    hint: 'Even non-CIF cloud outsourcing with customer data access requires enhanced data protection clauses and must be included in the DORA Register of Information.',
+    answers: [
+      { label: 'YES — access to customer/production data', type: 'yes', next: 'result_wesentlich_non_cif_access' },
+      { label: 'NO — internal/non-sensitive data only', type: 'no', next: 'result_wesentlich_non_cif' }
+    ]
+  },
+
+  'q3_material': {
+    step: 'STEP 4 / 8',
+    question: 'Could an outage or poor quality of this service materially harm the bank?',
+    hint: '<strong>Material impact means:</strong> jeopardising business activities, reputational damage, inability to meet regulatory requirements, financial loss to clients, or disruption of client services. <br><br><strong>Test:</strong> If the vendor switches off the service tomorrow — how long can the bank operate normally?',
+    answers: [
+      { label: 'YES — material impact', sublabel: 'An outage would be a serious issue', type: 'yes', next: 'q4_critical_func' },
+      { label: 'NO — limited impact', sublabel: 'The bank can operate without this service', type: 'no', next: 'q_nicht_wesentlich' }
+    ]
+  },
+
+  'q4_critical_func': {
+    step: 'STEP 4 / 7',
+    question: 'Does the service support a critical or important function of the bank (CIF)?',
+    hint: '<strong>Critical/Important Function (CIF)</strong> under DORA and EBA GL is a function whose disruption would: materially impair the bank’s financial performance, disrupt continuity of services to clients, or prevent compliance with regulatory obligations. <br><br><strong>Typically YES:</strong> core banking, payments, trading systems, risk management, AML/KYC systems, customer-facing digital channels. <br><strong>Typically NO:</strong> internal helpdesk, internal communications, HR systems, non-critical reporting.',
+    answers: [
+      { label: 'YES — supports a CIF', sublabel: 'Directly linked to a critical banking function', type: 'yes', next: 'q5_intragroup' },
+      { label: 'NO — does not support a CIF', sublabel: 'Internal support, no direct client/regulatory impact', type: 'no', next: 'q_wesentlich_non_cif' }
+    ]
+  },
+
+  'q5_intragroup': {
+    step: 'STEP 5 / 7',
+    question: 'Is the provider within the same group (intra-group)?',
+    hint: '<strong>Intra-group</strong> means the provider belongs to the same conglomerate/holding/group as the bank. <br><br>Important: intra-group status <strong>does not exempt</strong> you from MaRisk/DORA requirements — you still need a formal contract, SLA, audit rights, and an exit plan. Some procedural steps may be lighter.',
+    answers: [
+      { label: 'YES — intra-group provider', sublabel: 'Within the same group/holding', type: 'yes', next: 'q6_ctpp_intra' },
+      { label: 'NO — external provider', sublabel: 'Third party outside the group', type: 'no', next: 'q6_ctpp' }
+    ]
+  },
+
+  'q6_ctpp': {
+    step: 'STEP 6 / 7',
+    question: 'Is the provider a potential CTPP (Critical Third-Party Provider)?',
+    hint: '<strong>CTPP designation</strong> is made by the ESA authorities (EBA, ESMA, EIOPA) — you don’t decide it, but you must monitor it. <br><br><strong>Potential CTPP candidates:</strong> AWS, Microsoft Azure, Google Cloud, Oracle Cloud, IBM, Accenture and similar mega-providers serving many EU financial institutions. <br><br>Monitor the list of designated CTPPs published by the ESAs.',
+    answers: [
+      { label: 'YES / POSSIBLY — major cloud or mega provider', sublabel: 'AWS, Azure, Google, Oracle, etc.', type: 'yes', next: 'result_max' },
+      { label: 'NO — standard external vendor', sublabel: 'Specialised provider, not systemic', type: 'no', next: 'result_wesentlich_cif' }
+    ]
+  },
+
+  'q6_ctpp_intra': {
+    step: 'STEP 6 / 7',
+    question: 'Does the intra-group provider use external sub-vendors for the critical function?',
+    hint: '<strong>Sub-outsourcing risk:</strong> Even if the provider is intra-group, it may outsource further to external vendors. You remain responsible for the whole chain. <br><br>You must have visibility into the sub-outsourcing chain and approve all critical sub-vendors.',
+    answers: [
+      { label: 'YES — sub-outsourcing to an external vendor exists', sublabel: 'The chain goes outside the group', type: 'yes', next: 'result_intragroup_sub' },
+      { label: 'NO — everything stays within the group', sublabel: 'Pure intra-group arrangement', type: 'no', next: 'result_intragroup' }
+    ]
+  },
+
+  'q_non_ict': {
+    step: 'STEP 2 / 4',
+    question: 'Is this an activity the bank would normally perform itself, or would otherwise have to perform?',
+    hint: '<strong>Examples of non-ICT activities the bank would perform itself:</strong> outsourced credit analysts, compliance function, internal audit, back-office document processing, call centre. <br><br><strong>Non-ICT the bank would not do itself:</strong> cleaning, physical security, catering, transport.',
+    answers: [
+      { label: 'YES — the bank would do this itself', sublabel: 'Internal banking function', type: 'yes', next: 'q_non_ict_material' },
+      { label: 'NO — the bank would not do this', sublabel: 'General support, not a banking activity', type: 'no', next: 'result_fremdbezug' }
+    ]
+  },
+
+  'q_non_ict_material': {
+    step: 'STEP 3 / 4',
+    question: 'Could an outage materially harm the bank?',
+    hint: 'Same materiality criterion as for ICT — could the interruption materially jeopardise business activities, reputation, or the bank’s ability to meet regulatory requirements?',
+    answers: [
+      { label: 'YES — material impact', sublabel: 'Wesentliche Auslagerung (non-ICT)', type: 'yes', next: 'result_wesentlich_non_ict' },
+      { label: 'NO — limited impact', sublabel: 'Nicht-wesentliche Auslagerung', type: 'no', next: 'result_nicht_wesentlich_non_ict' }
+    ]
+  },
+
+  'q_fremdbezug_ict': {
+    step: 'STEP 3 / 4',
+    question: 'Does this ICT service support a critical function or have access to critical data/systems?',
+    hint: 'Even if this is not MaRisk outsourcing, from a DORA perspective it still matters — if an ICT service supports a critical function, DORA requirements apply. <br><br><strong>Example:</strong> Microsoft 365 (the bank would not run email itself) but it may be DORA CIF if used for regulatory communication.',
+    answers: [
+      { label: 'YES — access to critical systems/data', type: 'yes', next: 'result_fremdbezug_cif' },
+      { label: 'NO — limited, non-critical scope', type: 'no', next: 'result_fremdbezug_non_cif' }
+    ]
+  },
+
+  'q_nicht_wesentlich': {
+    step: 'STEP 4 / 5',
+    question: 'Does the ICT service still have access to the bank’s systems or data?',
+    hint: 'Even non-material outsourcing with system/data access must be included in the DORA Register of Information as an ICT third-party arrangement.',
+    answers: [
+      { label: 'YES — has access to systems/data', type: 'yes', next: 'result_nicht_wesentlich_ict' },
+      { label: 'NO — no access', type: 'no', next: 'result_nicht_wesentlich_no_access' }
+    ]
+  },
+
+  'q_wesentlich_non_cif': {
+    step: 'STEP 5 / 6',
+    question: 'Does the ICT service have access to customer data or production systems?',
+    hint: 'A material outsourcing arrangement that is not CIF still must be in the DORA register. The question is which level of requirements applies.',
+    answers: [
+      { label: 'YES — access to customer/production data', type: 'yes', next: 'result_wesentlich_non_cif_access' },
+      { label: 'NO — internal systems only', type: 'no', next: 'result_wesentlich_non_cif' }
+    ]
+  }
+};
+
+const results = {
+  'result_max': {
+    bafin_required: true,
+    title: 'MAXIMUM REQUIREMENTS LEVEL',
+    alert: { type: 'critical', text: 'This is the highest level of regulatory treatment: maximum across all three dimensions + potential CTPP oversight.' },
+    classifications: [
+      { type: 'marisk', label: 'MaRisk AT 9', value: 'Material outsourcing (Wesentliche Auslagerung)' },
+      { type: 'dora', label: 'DORA', value: 'ICT Third-Party — CIF' },
+      { type: 'eba', label: 'EBA GL', value: 'Critical/Important Function' }
+    ],
+    implications: [
+      'Formal contract with ALL Art. 30(2) and Art. 30(3) clauses',
+      'Unrestricted audit rights (bank, third parties, regulators)',
+      'Documented exit strategy — tested and kept up to date',
+      'Annual management report on this arrangement',
+      'Monitoring of CTPP designation and changes in the ESA list',
+      'TLPT cooperation clause in the contract (Art. 26–27)',
+      'Incident notification in the contract — aligned with DORA Art. 19 timelines',
+      'Sub-outsourcing approval — no critical sub-outsourcing without the bank’s prior approval',
+      'MaRisk outsourcing officer (Auslagerungsbeauftragter) must be involved',
+      'Concentration risk assessment and ongoing monitoring'
+    ],
+    examples: ['AWS / Azure / GCP', 'Core banking vendor', 'Payment processor', 'Oracle Cloud'],
+    ctpp: 'This provider is a potential <strong>Critical Third-Party Provider (CTPP)</strong>. Monitor the ESA CTPP designation list (published by EBA/ESMA/EIOPA). Assess your institution\'s <strong>concentration risk</strong> — how dependent are you on this single provider across functions? A CTPP designation triggers additional supervisory oversight under DORA Art. 31–44. Include concentration risk assessment in your annual management report.',
+    bafin: '<strong>Notification required.</strong> Material ICT outsourcing to a cloud provider supporting a critical function must be notified to BaFin. Notification is generally required <strong>before go-live</strong> (§ 25b KWG / MaRisk AT 9.2). Submit via BaFin\'s reporting portal. Your Auslagerungsbeauftragter must sign off before submission.',
+    timeline: 'Expect 3–6 months from first contact to signed contract. BaFin notification must be submitted before go-live.',
+    checklist: [
+      { text: 'Risk assessment document drafted and approved internally', tag: 'risk' },
+      { text: 'Due diligence questionnaire sent to vendor (security, financials, BCP)', tag: 'risk' },
+      { text: 'Contract template with all Art. 30(2) + 30(3) clauses prepared', tag: 'legal' },
+      { text: 'Audit rights clause negotiated and confirmed in writing', tag: 'legal' },
+      { text: 'Exit plan documented — including transition timeline and fallback', tag: 'ops' },
+      { text: 'Sub-outsourcing list requested and approved', tag: 'ops' },
+      { text: 'TLPT cooperation clause included in contract', tag: 'legal' },
+      { text: 'Management sign-off obtained (Auslagerungsbeauftragter + board-level if required)', tag: 'mgmt' },
+      { text: 'BaFin notification assessed — check if prior notification required', tag: 'mgmt' },
+      { text: 'Entry prepared for Register of Information (DORA)', tag: 'ops' },
+      { text: 'Concentration risk assessed — check group-level exposure to this vendor', tag: 'risk' }
+    ]
+  },
+
+  'result_wesentlich_cif': {
+    bafin_required: true,
+    title: 'HIGH REQUIREMENTS LEVEL',
+    alert: { type: 'warning', text: 'Material outsourcing + DORA CIF. Full outsourcing and DORA requirements without the CTPP dimension.' },
+    classifications: [
+      { type: 'marisk', label: 'MaRisk AT 9', value: 'Material outsourcing (Wesentliche Auslagerung)' },
+      { type: 'dora', label: 'DORA', value: 'ICT Third-Party — CIF' },
+      { type: 'eba', label: 'EBA GL', value: 'Critical/Important Function' }
+    ],
+    implications: [
+      'Formal contract with Art. 30(2) + Art. 30(3) clauses',
+      'Audit rights — bank, third parties, regulators',
+      'Documented and tested exit strategy',
+      'Annual management report',
+      'Sub-outsourcing controls and approvals',
+      'TLPT cooperation clause',
+      'Vendor obligation to notify the bank about incidents',
+      'BCP (Business Continuity Plan) requirement for the vendor',
+      'MaRisk outsourcing officer involved'
+    ],
+    examples: ['Specialised AML vendor', 'Risk engine provider', 'Digital banking platform', 'Core banking (non-CTPP)'],
+    ctpp: 'Although this provider is not a hyperscaler, <strong>assess concentration risk</strong> — particularly if this vendor serves a significant share of the EU financial sector. Monitor the ESA CTPP list for any future designation of this provider. If designated as CTPP after contract signing, additional DORA Art. 31+ requirements will apply.',
+    bafin: '<strong>Notification required.</strong> Material outsourcing of an ICT service supporting a critical function must be notified to BaFin before go-live (§ 25b KWG / MaRisk AT 9.2). Your Auslagerungsbeauftragter must sign off. Submit via BaFin reporting portal.',
+    timeline: 'Expect 2–4 months from vendor selection to signed contract. BaFin notification required before go-live.',
+    checklist: [
+      { text: 'Risk assessment completed and documented', tag: 'risk' },
+      { text: 'Due diligence questionnaire completed by vendor', tag: 'risk' },
+      { text: 'Contract with Art. 30(2) + 30(3) clauses drafted', tag: 'legal' },
+      { text: 'Audit rights confirmed in contract', tag: 'legal' },
+      { text: 'Exit strategy documented and approved', tag: 'ops' },
+      { text: 'Sub-outsourcing list reviewed and approved', tag: 'ops' },
+      { text: 'TLPT cooperation clause included', tag: 'legal' },
+      { text: 'Vendor BCP reviewed and adequate for bank\'s RTO/RPO', tag: 'risk' },
+      { text: 'Management sign-off from Auslagerungsbeauftragter', tag: 'mgmt' },
+      { text: 'Register of Information entry prepared', tag: 'ops' }
+    ]
+  },
+
+  'result_intragroup': {
+    bafin_required: true,
+    title: 'INTRA-GROUP — MATERIAL OUTSOURCING + CIF',
+    alert: { type: 'warning', text: 'Intra-group status does not exempt you from requirements. A contract and formal audit rights are still mandatory.' },
+    classifications: [
+      { type: 'marisk', label: 'MaRisk AT 9', value: 'Material outsourcing (intra-group)' },
+      { type: 'dora', label: 'DORA', value: 'ICT Third-Party — CIF (intra-group)' },
+      { type: 'eba', label: 'EBA GL', value: 'Critical function (intra-group — slightly simplified)' }
+    ],
+    implications: [
+      'Formal intra-group SLA contract — must be in writing',
+      'Art. 30(2) and Art. 30(3) clauses apply to intra-group as well',
+      'Audit rights must be formally agreed',
+      'Exit strategy must be practical and documented',
+      'EBA GL allows simplified due diligence — use it where appropriate',
+      'Annual management report',
+      'Intra-group arrangements must be included in the Register of Information'
+    ],
+    examples: ['Group data centre', 'Group IT shared services', 'Group payment hub'],
+    bafin: '<strong>Notification required.</strong> Intra-group status does not exempt material outsourcing from BaFin notification (§ 25b KWG). Notify before go-live. Note: BaFin may apply a lighter review for intra-group arrangements, but the notification obligation remains.',
+    timeline: 'Expect 4–8 weeks for intra-group SLA — faster than external, but BaFin notification and formal sign-off still required.',
+    checklist: [
+      { text: 'Intra-group SLA drafted in writing — verbal agreements are not sufficient', tag: 'legal' },
+      { text: 'Art. 30(2) + 30(3) clauses confirmed in the SLA', tag: 'legal' },
+      { text: 'Audit rights explicitly agreed — even for group entities', tag: 'legal' },
+      { text: 'Exit plan documented — what if the group entity cannot deliver?', tag: 'ops' },
+      { text: 'Simplified due diligence completed under EBA GL', tag: 'risk' },
+      { text: 'Register of Information entry prepared', tag: 'ops' },
+      { text: 'Management sign-off obtained', tag: 'mgmt' }
+    ]
+  },
+
+  'result_intragroup_sub': {
+    bafin_required: true,
+    title: 'INTRA-GROUP WITH SUB-OUTSOURCING',
+    alert: { type: 'critical', text: 'Sub-outsourcing to an external vendor — you remain responsible for the entire chain. Visibility is mandatory.' },
+    classifications: [
+      { type: 'marisk', label: 'MaRisk AT 9', value: 'Material outsourcing (with sub-outsourcing)' },
+      { type: 'dora', label: 'DORA', value: 'CIF — sub-outsourcing chain' },
+      { type: 'eba', label: 'EBA GL', value: 'Critical function + sub-contractor requirements' }
+    ],
+    implications: [
+      'Map the full chain: bank → intra-group entity → external vendor',
+      'Formal approval of each external sub-vendor by the bank',
+      'Sub-outsourcing clause must be included in the intra-group contract',
+      'Register must show the sub-outsourcing chain',
+      'External vendor is subject to the same requirements as a direct vendor',
+      'Concentration risk assessment for the entire chain',
+      'Exit strategy must cover scenarios where the external vendor fails'
+    ],
+    examples: ['Group IT company using AWS', 'Intra-group payment entity using SWIFT'],
+    ctpp: 'The external sub-vendor may be a hyperscaler or potential CTPP. <strong>Assess concentration risk across the full chain</strong> — bank → intra-group entity → external vendor. If the sub-vendor is AWS/Azure/GCP, CTPP monitoring obligations apply at the end of the chain.',
+    bafin: '<strong>Notification required.</strong> The arrangement is material outsourcing with sub-outsourcing. BaFin must be notified before go-live. The sub-outsourcing chain must be disclosed in the notification. Approval of each external sub-vendor must be documented.',
+    timeline: 'Expect 2–4 months. The external sub-vendor adds complexity — BaFin notification must cover the full chain.',
+    checklist: [
+      { text: 'Full outsourcing chain mapped: bank → group entity → external vendor', tag: 'ops' },
+      { text: 'External sub-vendor approved by the bank formally', tag: 'mgmt' },
+      { text: 'Sub-outsourcing clause in the intra-group SLA — rights flow through', tag: 'legal' },
+      { text: 'External vendor subject to equivalent contractual requirements', tag: 'legal' },
+      { text: 'Register of Information shows the full chain', tag: 'ops' },
+      { text: 'Concentration risk assessed across the entire chain', tag: 'risk' },
+      { text: 'Exit plan covers scenario where external vendor fails', tag: 'ops' },
+      { text: 'Management sign-off for both intra-group arrangement and sub-vendor', tag: 'mgmt' }
+    ]
+  },
+
+  'result_wesentlich_non_cif': {
+    bafin_required: true,
+    title: 'MATERIAL OUTSOURCING — non-CIF',
+    classifications: [
+      { type: 'marisk', label: 'MaRisk AT 9', value: 'Material outsourcing (Wesentliche Auslagerung)' },
+      { type: 'dora', label: 'DORA', value: 'ICT Third-Party — non-CIF' },
+      { type: 'eba', label: 'EBA GL', value: 'Non-critical function' }
+    ],
+    implications: [
+      'Formal contract — Art. 30(2) clauses required',
+      'Art. 30(3) clauses not strictly mandatory — but recommended for this category',
+      'Audit rights must be agreed',
+      'Annual management report — MaRisk requirement',
+      'Included in the Register of Information — DORA requirement',
+      'Due diligence before contracting',
+      'Sub-outsourcing controls'
+    ],
+    examples: ['Internal IT helpdesk service', 'Non-critical reporting tool', 'Internal communications platforms'],
+    bafin: '<strong>Notification required.</strong> Material outsourcing (wesentliche Auslagerung) must be notified to BaFin regardless of CIF status (§ 25b KWG / MaRisk AT 9.2). Notify before go-live.',
+    timeline: 'Expect 4–8 weeks from vendor selection to signed contract. BaFin notification required before go-live.',
+    checklist: [
+      { text: 'Risk assessment completed (lighter scope than CIF)', tag: 'risk' },
+      { text: 'Contract with Art. 30(2) clauses drafted', tag: 'legal' },
+      { text: 'Audit rights agreed in contract', tag: 'legal' },
+      { text: 'Annual management report process set up', tag: 'mgmt' },
+      { text: 'Register of Information entry prepared', tag: 'ops' },
+      { text: 'Sub-outsourcing controls in place', tag: 'ops' },
+      { text: 'Auslagerungsbeauftragter sign-off obtained', tag: 'mgmt' }
+    ]
+  },
+
+  'result_wesentlich_non_cif_access': {
+    bafin_required: true,
+    title: 'MATERIAL OUTSOURCING — non-CIF with data access',
+    alert: { type: 'warning', text: 'Access to customer data still requires enhanced security clauses even if the service is not CIF.' },
+    classifications: [
+      { type: 'marisk', label: 'MaRisk AT 9', value: 'Material outsourcing (Wesentliche Auslagerung)' },
+      { type: 'dora', label: 'DORA', value: 'ICT Third-Party — non-CIF (with data access)' },
+      { type: 'eba', label: 'EBA GL', value: 'Non-critical + data protection requirements' }
+    ],
+    implications: [
+      'Art. 30(2) clauses required, especially point (c) on data protection',
+      'GDPR Data Processing Agreement required',
+      'Information security clauses proportional to the access level',
+      'Incident notification for data breaches',
+      'Included in the Register of Information',
+      'Recommended periodic review of access rights'
+    ],
+    examples: ['CRM with customer data', 'Analytics platform with data access', 'External fraud detection with transaction data'],
+    bafin: '<strong>Notification required.</strong> Material outsourcing with customer data access must be notified to BaFin before go-live (§ 25b KWG). The data processing scope should be described in the notification.',
+    timeline: 'Expect 6–10 weeks — GDPR and data protection review adds time. BaFin notification required before go-live.',
+    checklist: [
+      { text: 'Risk assessment with data protection impact considered', tag: 'risk' },
+      { text: 'GDPR Data Processing Agreement (DPA/AVV) drafted and signed', tag: 'legal' },
+      { text: 'Contract with Art. 30(2) clauses including data protection point (c)', tag: 'legal' },
+      { text: 'Information security clauses proportional to data access level', tag: 'legal' },
+      { text: 'Incident notification clause for data breaches included', tag: 'legal' },
+      { text: 'Data access scope documented and limited to minimum necessary', tag: 'risk' },
+      { text: 'Register of Information entry prepared', tag: 'ops' },
+      { text: 'Audit rights agreed', tag: 'legal' },
+      { text: 'Auslagerungsbeauftragter sign-off obtained', tag: 'mgmt' }
+    ]
+  },
+
+  'result_nicht_wesentlich_ict': {
+    title: 'NON-MATERIAL OUTSOURCING — included in the DORA register',
+    classifications: [
+      { type: 'marisk', label: 'MaRisk AT 9', value: 'Non-material outsourcing (Nicht-wesentliche Auslagerung)' },
+      { type: 'dora', label: 'DORA', value: 'ICT Third-Party — non-CIF' },
+      { type: 'eba', label: 'EBA GL', value: 'Non-critical' }
+    ],
+    implications: [
+      'Contract with basic clauses — Art. 30(2)',
+      'Included in the Register of Information (DORA requirement)',
+      'Standard vendor management process',
+      'Periodic re-evaluation of classification',
+      'Incident notification clause recommended'
+    ],
+    examples: ['Low-risk SaaS tools', 'Internal analytics platforms', 'Non-critical development tools'],
+    bafin: '<strong>No BaFin notification required</strong> for non-material outsourcing. However, the arrangement must be documented in your internal outsourcing register and included in the DORA Register of Information. If classification changes to material in future, notification obligation arises immediately.',
+    timeline: 'Expect 2–4 weeks. Lighter process but register entry and basic contract clauses are still mandatory.',
+    checklist: [
+      { text: 'Basic contract with Art. 30(2) minimum clauses confirmed', tag: 'legal' },
+      { text: 'Incident notification clause included (recommended)', tag: 'legal' },
+      { text: 'Register of Information entry prepared — mandatory for all ICT services', tag: 'ops' },
+      { text: 'Periodic re-evaluation date set (recommend annual)', tag: 'ops' },
+      { text: 'Standard vendor management process initiated', tag: 'ops' }
+    ]
+  },
+
+  'result_nicht_wesentlich_no_access': {
+    title: 'NON-MATERIAL OUTSOURCING',
+    classifications: [
+      { type: 'marisk', label: 'MaRisk AT 9', value: 'Non-material outsourcing (Nicht-wesentliche Auslagerung)' },
+      { type: 'dora', label: 'DORA', value: 'ICT Third-Party — non-CIF (minimal scope)' },
+      { type: 'eba', label: 'EBA GL', value: 'Non-critical' }
+    ],
+    implications: [
+      'Standard contract with minimal Art. 30(2) clauses',
+      'Included in the Register of Information if there is an ICT element',
+      'Regular vendor management review',
+      'Classification must be re-evaluated if the scope expands'
+    ],
+    examples: ['Small SaaS without system access', 'Specialised tools for internal processes'],
+    bafin: '<strong>No BaFin notification required.</strong> Non-material outsourcing without system access is below the notification threshold. Document in internal register. Re-evaluate if scope expands.',
+    timeline: 'Expect 1–2 weeks. Minimal regulatory burden — standard procurement process applies.',
+    checklist: [
+      { text: 'Standard contract with minimal Art. 30(2) clauses confirmed', tag: 'legal' },
+      { text: 'Check if any ICT element exists — if yes, register entry required', tag: 'ops' },
+      { text: 'Re-evaluation trigger set if scope expands (data access, system integration)', tag: 'ops' },
+      { text: 'Standard vendor management process initiated', tag: 'ops' }
+    ]
+  },
+
+  'result_fremdbezug': {
+    title: 'OTHER EXTERNAL PROCUREMENT — outside outsourcing scope',
+    classifications: [
+      { type: 'marisk', label: 'MaRisk AT 9', value: 'Other external procurement (not outsourcing)' },
+      { type: 'dora', label: 'DORA', value: 'Outside DORA scope' },
+      { type: 'eba', label: 'EBA GL', value: 'Outside outsourcing definition' }
+    ],
+    implications: [
+      'No MaRisk outsourcing requirements',
+      'Standard procurement/vendor management process',
+      'GDPR obligations apply if personal data is involved',
+      'Reassess classification if ICT components or system access are added'
+    ],
+    examples: ['Physical security', 'Cleaning', 'Catering', 'Transport', 'Office lease'],
+    bafin: '<strong>No BaFin notification required.</strong> This arrangement falls outside the outsourcing definition — no notification obligation under § 25b KWG. If scope changes to include ICT or system access, re-classify and reassess.',
+    timeline: 'Standard procurement timeline applies — no regulatory outsourcing process required.',
+    checklist: [
+      { text: 'Confirm no ICT components or system access are involved', tag: 'ops' },
+      { text: 'GDPR obligations checked — if personal data processed, DPA required', tag: 'legal' },
+      { text: 'Note: if scope changes to include ICT or system access, re-classify immediately', tag: 'ops' }
+    ]
+  },
+
+  'result_fremdbezug_cif': {
+    title: 'OTHER EXTERNAL PROCUREMENT — but DORA ICT CIF',
+    alert: { type: 'warning', text: 'Not MaRisk outsourcing, but under DORA this is an ICT arrangement supporting a critical function. DORA requirements apply.' },
+    classifications: [
+      { type: 'marisk', label: 'MaRisk AT 9', value: 'Other external procurement' },
+      { type: 'dora', label: 'DORA', value: 'ICT Third-Party — CIF (!!)' },
+      { type: 'eba', label: 'EBA GL', value: 'Outside outsourcing — but DORA Art. 30(3)' }
+    ],
+    implications: [
+      'Must be included in the Register of Information (DORA)',
+      'Art. 30(2) + Art. 30(3) clauses — required by DORA regardless of MaRisk status',
+      'Audit rights — required by DORA',
+      'Exit strategy must be considered',
+      'Incident notification clause is mandatory',
+      'No MaRisk annual management report, but DORA governance requirements apply'
+    ],
+    examples: ['Microsoft 365 for regulatory communication', 'Telecom infrastructure critical for systems', 'EDR/antivirus on critical servers'],
+    ctpp: 'If this provider is a major hyperscaler (Microsoft, AWS, etc.), <strong>CTPP monitoring applies</strong> even though this is not MaRisk outsourcing. Assess concentration risk. DORA Art. 31+ oversight obligations apply if the provider is formally designated as CTPP by the ESAs.',
+    bafin: '<strong>No MaRisk notification required</strong> (this is not outsourcing under § 25b KWG). However, <strong>DORA governance obligations apply</strong> — the arrangement must be in the Register of Information and DORA contractual requirements must be met. BaFin may review DORA compliance during ICT risk assessments.',
+    timeline: 'Expect 4–8 weeks. Not MaRisk outsourcing but DORA requirements are binding — legal review of contract clauses required.',
+    checklist: [
+      { text: 'Register of Information entry prepared — mandatory under DORA', tag: 'ops' },
+      { text: 'Art. 30(2) + 30(3) clauses reviewed and added to contract', tag: 'legal' },
+      { text: 'Audit rights clause negotiated — may be difficult with large vendors', tag: 'legal' },
+      { text: 'Exit strategy considered and documented', tag: 'ops' },
+      { text: 'Incident notification clause included in contract', tag: 'legal' },
+      { text: 'No MaRisk annual report needed, but DORA governance file maintained', tag: 'mgmt' }
+    ]
+  },
+
+  'result_fremdbezug_non_cif': {
+    title: 'OTHER EXTERNAL PROCUREMENT — DORA non-CIF',
+    classifications: [
+      { type: 'marisk', label: 'MaRisk AT 9', value: 'Other external procurement' },
+      { type: 'dora', label: 'DORA', value: 'ICT Third-Party — non-CIF' },
+      { type: 'eba', label: 'EBA GL', value: 'Outside outsourcing definition' }
+    ],
+    implications: [
+      'Included in the Register of Information (DORA)',
+      'Art. 30(2) clauses — minimum DORA requirement',
+      'Standard vendor management',
+      'Periodic re-classification recommended'
+    ],
+    examples: ['Standard software licences', 'Public cloud storage for non-critical content', 'Communication tools without critical usage'],
+    bafin: '<strong>No BaFin notification required.</strong> Not MaRisk outsourcing — below notification threshold. DORA Register of Information entry still required. Monitor for scope changes.',
+    timeline: 'Expect 1–3 weeks. Light regulatory process — mainly register entry and basic contract check.',
+    checklist: [
+      { text: 'Register of Information entry prepared — required by DORA', tag: 'ops' },
+      { text: 'Art. 30(2) minimum clauses confirmed in contract', tag: 'legal' },
+      { text: 'Periodic re-classification reminder set', tag: 'ops' },
+      { text: 'Standard vendor management process initiated', tag: 'ops' }
+    ]
+  },
+
+  'result_wesentlich_non_ict': {
+    bafin_required: true,
+    title: 'MATERIAL OUTSOURCING — non-ICT',
+    classifications: [
+      { type: 'marisk', label: 'MaRisk AT 9', value: 'Material outsourcing (non-ICT)' },
+      { type: 'dora', label: 'DORA', value: 'Outside DORA scope' },
+      { type: 'eba', label: 'EBA GL', value: 'Critical/Important (non-ICT)' }
+    ],
+    implications: [
+      'Full MaRisk AT 9 requirements: contract, audit, exit plan, annual management report',
+      'EBA GL requirements for outsourcing critical functions',
+      'DORA does not apply — no ICT component',
+      'If an ICT component is added, classification changes',
+      'Concentration risk assessment'
+    ],
+    examples: ['Outsourced compliance function', 'External audit/control', 'Outsourced back-office operations (non-IT)'],
+    bafin: '<strong>Notification required.</strong> Material outsourcing of a non-ICT function is still subject to BaFin notification under § 25b KWG / MaRisk AT 9.2. Notify before go-live. DORA does not apply here, but MaRisk notification obligations remain in full.',
+    timeline: 'Expect 6–10 weeks. Full MaRisk process applies. BaFin notification required before go-live.',
+    checklist: [
+      { text: 'Risk assessment completed and documented', tag: 'risk' },
+      { text: 'Full MaRisk AT 9 compliant contract drafted', tag: 'legal' },
+      { text: 'Audit rights agreed in contract', tag: 'legal' },
+      { text: 'Exit plan documented and approved', tag: 'ops' },
+      { text: 'Annual management report process set up', tag: 'mgmt' },
+      { text: 'Concentration risk assessment completed', tag: 'risk' },
+      { text: 'EBA GL requirements confirmed (non-ICT path)', tag: 'legal' },
+      { text: 'Auslagerungsbeauftragter sign-off obtained', tag: 'mgmt' },
+      { text: 'Note: if ICT component is added later, re-classify immediately', tag: 'ops' }
+    ]
+  },
+
+  'result_nicht_wesentlich_non_ict': {
+    title: 'NON-MATERIAL OUTSOURCING — non-ICT',
+    classifications: [
+      { type: 'marisk', label: 'MaRisk AT 9', value: 'Non-material outsourcing (Nicht-wesentliche Auslagerung)' },
+      { type: 'dora', label: 'DORA', value: 'Outside DORA scope' },
+      { type: 'eba', label: 'EBA GL', value: 'Non-critical (non-ICT)' }
+    ],
+    implications: [
+      'MaRisk: standard outsourcing contract, lighter requirements',
+      'Periodic review of classification',
+      'DORA does not apply',
+      'Vendor management process'
+    ],
+    examples: ['Minor outsourced processes', 'Specialised non-critical services'],
+    bafin: '<strong>No BaFin notification required.</strong> Non-material outsourcing is below the notification threshold. Document in internal outsourcing register. If classification changes to material, notification obligation arises.',
+    timeline: 'Expect 2–3 weeks. Light outsourcing process — standard contract and periodic review.',
+    checklist: [
+      { text: 'Standard outsourcing contract drafted', tag: 'legal' },
+      { text: 'Periodic classification review scheduled', tag: 'ops' },
+      { text: 'DORA does not apply — no register entry required (unless ICT element exists)', tag: 'ops' },
+      { text: 'Standard vendor management process initiated', tag: 'ops' }
+    ]
+  }
+};
+
+// State
+let history = [];
+let currentNode = null;
+let arrangementType = null; // 'new' or 'reassess'
+let materialityChanged = null; // true/false — only for reassess path
+let checkboxCounter = 0;
+
+const LANDING = '__landing__';
+const REASSESS_CHANGE = '__reassess_change__';
+
+function getNode(id) {
+  if (id === 'start') return tree;
+  return nodes[id] || null;
+}
+
+function getResult(id) {
+  return results[id] || null;
+}
+
+function isResult(id) {
+  return id && id.startsWith('result_');
+}
+
+function render() {
+  const container = document.getElementById('treeContainer');
+
+  if (!currentNode || currentNode === LANDING) {
+    document.getElementById('progressFill').style.width = '0%';
+    document.getElementById('breadcrumb').innerHTML = '';
+    document.getElementById('breadcrumb').style.display = 'none';
+    document.getElementById('backBtn').style.display = 'none';
+    document.querySelector('.progress-bar').style.display = 'none';
+    renderLanding(container);
+    return;
+  }
+
+  if (currentNode === REASSESS_CHANGE) {
+    document.getElementById('breadcrumb').style.display = '';
+    document.getElementById('backBtn').style.display = '';
+    document.querySelector('.progress-bar').style.display = '';
+    document.getElementById('progressFill').style.width = '92%';
+    document.getElementById('backBtn').disabled = false;
+    renderReassessChange(container);
+    return;
+  }
+
+  document.getElementById('breadcrumb').style.display = '';
+  document.getElementById('backBtn').style.display = '';
+  document.querySelector('.progress-bar').style.display = '';
+
+  const totalSteps = 9;
+  const progress = Math.min((history.length / totalSteps) * 100, 90);
+  document.getElementById('progressFill').style.width = progress + '%';
+
+  const bc = document.getElementById('breadcrumb');
+  const items = [arrangementType === 'reassess' ? 'Reassessment' : 'New arrangement'];
+  history.forEach(h => { if (h.answerLabel) items.push(h.answerLabel); });
+  bc.innerHTML = items.map((item, i) => {
+    const isLast = i === items.length - 1;
+    return `<span class="breadcrumb-item ${isLast ? 'active' : ''}">${item}</span>${!isLast ? '<span class="breadcrumb-sep">›</span>' : ''}`;
+  }).join('');
+
+  document.getElementById('backBtn').disabled = history.length === 0;
+
+  if (isResult(currentNode)) {
+    renderResult(container, getResult(currentNode));
+  } else {
+    const node = getNode(currentNode);
+    if (node) renderQuestion(container, node);
+  }
+}
+
+function renderLanding(container) {
+  container.innerHTML = `
+    <div class="landing-screen">
+      <div class="landing-intro">
+        <div class="landing-intro-label">Before you start</div>
+        <div class="landing-intro-text">
+          External arrangements require formal classification according to the institution's outsourcing policy and applicable regulatory frameworks. The classification determines contractual requirements, risk assessment scope, and ongoing monitoring obligations.
+        </div>
+      </div>
+      <div class="landing-question-label">What type of classification is this?</div>
+      <div class="landing-choice-grid">
+        <button class="landing-choice-btn" onclick="setArrangementType('new')">
+          <span class="landing-choice-icon">🆕</span>
+          <div class="landing-choice-title">New arrangement</div>
+          <div class="landing-choice-desc">First-time classification of a vendor or service not previously assessed under the institution's outsourcing framework.</div>
+          <span class="landing-choice-tag">Notification obligations under § 25b KWG, MaRisk AT 9, and DORA Art. 28(2) are subject to assessment</span>
+        </button>
+        <button class="landing-choice-btn reassess" onclick="setArrangementType('reassess')">
+          <span class="landing-choice-icon">🔄</span>
+          <div class="landing-choice-title">Reassessment</div>
+          <div class="landing-choice-desc">Periodic review or re-classification of an existing arrangement following a scope change, contract renewal, or material change in risk profile.</div>
+          <span class="landing-choice-tag">Notification obligations under § 25b KWG and MaRisk AT 9 arise only upon change in materiality classification</span>
+        </button>
+      </div>
+    </div>
+  `;
+}
+
+function renderReassessChange(container) {
+  container.innerHTML = `
+    <div class="question-card">
+      <div class="step-label">REASSESSMENT — FINAL STEP</div>
+      <div class="question-text">Has the materiality classification changed compared to the previous assessment?</div>
+      <div class="question-hint">
+        <strong>Materiality change means:</strong> the arrangement was previously classified as non-material (nicht-wesentlich) and is now material (wesentlich), or vice versa.<br><br>
+        <strong>No BaFin notification needed if:</strong> classification stays the same — even if scope, contract terms, or vendor details changed.<br>
+        <strong>BaFin notification required if:</strong> non-material → material, or material → non-material.
+      </div>
+      <div class="answers">
+        <button class="answer-btn yes" onclick="setMaterialityChanged(true)">
+          <div class="answer-icon">YES</div>
+          <div>
+            <div class="answer-label">YES — materiality has changed</div>
+            <div class="answer-sublabel">e.g. non-material → material, or material → non-material</div>
+          </div>
+        </button>
+        <button class="answer-btn no" onclick="setMaterialityChanged(false)">
+          <div class="answer-icon">NO</div>
+          <div>
+            <div class="answer-label">NO — same materiality as before</div>
+            <div class="answer-sublabel">Classification unchanged — only scope or terms updated</div>
+          </div>
+        </button>
+      </div>
+    </div>
+  `;
+}
+
+function setArrangementType(type) {
+  arrangementType = type;
+  materialityChanged = null;
+  history = [];
+  currentNode = 'start';
+  render();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function setMaterialityChanged(changed) {
+  materialityChanged = changed;
+  const lastEntry = history[history.length - 1];
+  const resultNode = lastEntry?.nextResult;
+  history.push({ node: REASSESS_CHANGE, answerLabel: changed ? 'Materiality changed' : 'Same materiality' });
+  currentNode = resultNode;
+  render();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function getBafinHtml(result) {
+  if (!result.bafin_required) {
+    return `
+      <div class="bafin-flag">
+        <div class="bafin-flag-icon">🏛</div>
+        <div class="bafin-flag-body">
+          <div class="bafin-flag-title">BaFin Notification</div>
+          <div class="bafin-flag-text">${result.bafin}</div>
+        </div>
+      </div>`;
+  }
+
+  if (arrangementType === 'reassess') {
+    if (!materialityChanged) {
+      return `
+        <div class="bafin-flag">
+          <div class="bafin-flag-icon">🏛</div>
+          <div class="bafin-flag-body">
+            <div class="bafin-flag-title">BaFin Notification — Reassessment</div>
+            <div class="bafin-flag-text">
+              <strong>No BaFin notification required.</strong> The materiality classification has not changed.
+              Document the reassessment outcome in your internal outsourcing register and update the Register of Information if any details changed.
+            </div>
+          </div>
+        </div>`;
+    } else {
+      return `
+        <div class="bafin-flag">
+          <div class="bafin-flag-icon">🏛</div>
+          <div class="bafin-flag-body">
+            <div class="bafin-flag-title">BaFin Notification — Materiality Change</div>
+            <div class="bafin-flag-text">
+              <strong>Notification required — materiality has changed.</strong>
+              <div class="bafin-steps">
+                <div class="bafin-step">
+                  <div class="bafin-step-num">1</div>
+                  <div class="bafin-step-text"><strong>Reclassification notification</strong> — notify BaFin of the materiality change, the reason, and the updated classification. Include the updated risk assessment. Submit via BaFin reporting portal.</div>
+                </div>
+              </div>
+              <div style="margin-top:10px; font-size:12px; color:var(--text-dim);">Legal basis: § 25b KWG / MaRisk AT 9.2</div>
+            </div>
+          </div>
+        </div>`;
+    }
+  }
+
+  // New arrangement — 2 notifications
+  return `
+    <div class="bafin-flag">
+      <div class="bafin-flag-icon">🏛</div>
+      <div class="bafin-flag-body">
+        <div class="bafin-flag-title">BaFin Notification — New Material Arrangement</div>
+        <div class="bafin-flag-text">
+          <strong>Two notifications required.</strong> Submit via BaFin reporting portal. Auslagerungsbeauftragter sign-off required before each submission.
+          <div class="bafin-steps">
+            <div class="bafin-step">
+              <div class="bafin-step-num">1</div>
+              <div class="bafin-step-text"><strong>Intention to Outsource</strong> — notify BaFin <em>before contract signing</em>. Include vendor name, service description, materiality rationale, and planned go-live date.</div>
+            </div>
+            <div class="bafin-step">
+              <div class="bafin-step-num">2</div>
+              <div class="bafin-step-text"><strong>Go-Live notification</strong> — notify BaFin <em>when the arrangement becomes operational</em>. Confirm contract date, actual go-live, and any deviations from the Intention notification.</div>
+            </div>
+          </div>
+          <div style="margin-top:10px; font-size:12px; color:var(--text-dim);">Legal basis: § 25b KWG / MaRisk AT 9.2</div>
+        </div>
+      </div>
+    </div>`;
+}
+
+function renderQuestion(container, node) {
+  container.innerHTML = `
+    <div class="question-card">
+      <div class="step-label">${node.step || ''}</div>
+      <div class="question-text">${node.question}</div>
+      ${node.hint ? `<div class="question-hint">${node.hint}</div>` : ''}
+      <div class="answers">
+        ${node.answers.map(a => `
+          <button class="answer-btn ${a.type}" onclick="answer('${a.next}', '${a.label.replace(/'/g, "\\'")}')">
+            <div class="answer-icon">${a.type === 'yes' ? 'YES' : a.type === 'no' ? 'NO' : '?'}</div>
+            <div>
+              <div class="answer-label">${a.label}</div>
+              ${a.sublabel ? `<div class="answer-sublabel">${a.sublabel}</div>` : ''}
+            </div>
+          </button>
+        `).join('')}
+      </div>
+    </div>
+  `;
+}
+
+function renderResult(container, result) {
+  const alertHtml = result.alert ? `
+    <div class="alert alert-${result.alert.type}">
+      <div class="alert-icon">${result.alert.type === 'critical' ? '⚠' : '!'}</div>
+      <div>${result.alert.text}</div>
+    </div>` : '';
+
+  const ctppHtml = result.ctpp ? `
+    <div class="ctpp-flag">
+      <div class="ctpp-flag-icon">⚡</div>
+      <div class="ctpp-flag-body">
+        <div class="ctpp-flag-title">CTPP — Concentration Risk Check Required</div>
+        <div class="ctpp-flag-text">${result.ctpp}</div>
+      </div>
+    </div>` : '';
+
+  const bafinHtml = getBafinHtml(result);
+
+  const timelineHtml = result.timeline ? `
+    <div class="timeline-banner">
+      <div class="tl-icon">⏱</div>
+      <div><strong>Expected timeline:</strong> ${result.timeline}</div>
+    </div>` : '';
+
+  const checklistHtml = result.checklist ? `
+    <div class="checklist-section">
+      <div class="checklist-title">What to prepare before contracting</div>
+      <div class="checklist">
+        ${result.checklist.map((item, i) => {
+          const id = 'cb_' + (++checkboxCounter) + '_' + i;
+          return `
+          <div class="checklist-item">
+            <input type="checkbox" id="${id}">
+            <label for="${id}">${item.text}</label>
+            <span class="ci-tag ${item.tag}">${item.tag}</span>
+          </div>`;
+        }).join('')}
+      </div>
+    </div>` : '';
+
+  container.innerHTML = `
+    <div class="result-card">
+      <div class="result-title">✓ Classification determined</div>
+      <h2 style="font-size:20px;font-weight:700;color:#fff;margin-bottom:20px;">${result.title}</h2>
+      ${alertHtml}
+      ${ctppHtml}
+      ${bafinHtml}
+      ${timelineHtml}
+      <div class="classification-grid">
+        ${result.classifications.map(c => `
+          <div class="class-badge ${c.type}">
+            <div class="class-badge-label">${c.label}</div>
+            <div class="class-badge-value">${c.value}</div>
+          </div>
+        `).join('')}
+      </div>
+      <div class="implications-title">What this means for you</div>
+      <ul class="implication-list">
+        ${result.implications.map(i => `<li>${i}</li>`).join('')}
+      </ul>
+      ${checklistHtml}
+      ${result.examples ? `
+        <div class="examples-box">
+          <div class="examples-title">Examples</div>
+          <div class="examples-list">
+            ${result.examples.map(e => `<span class="example-tag">${e}</span>`).join('')}
+          </div>
+        </div>` : ''}
+      <div class="restart-area">
+        <div class="btn-group">
+          <button class="btn btn-primary" onclick="restart()">Classify a new service</button>
+          <button class="btn btn-secondary" onclick="goBack()">← Change answer</button>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function answer(nextId, label) {
+  if (arrangementType === 'reassess' && isResult(nextId) && materialityChanged === null) {
+    history.push({ node: currentNode, answerLabel: label, nextResult: nextId });
+    currentNode = REASSESS_CHANGE;
+    render();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    return;
+  }
+  history.push({ node: currentNode, answerLabel: label });
+  currentNode = nextId;
+  render();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function goBack() {
+  if (history.length === 0) {
+    currentNode = LANDING;
+    arrangementType = null;
+    materialityChanged = null;
+    render();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    return;
+  }
+  const prev = history.pop();
+  if (currentNode === REASSESS_CHANGE || prev.nextResult) {
+    materialityChanged = null;
+  }
+  currentNode = prev.node;
+  render();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function restart() {
+  history = [];
+  currentNode = LANDING;
+  arrangementType = null;
+  materialityChanged = null;
+  render();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+render();
+</script>
+</body>
+</html>
