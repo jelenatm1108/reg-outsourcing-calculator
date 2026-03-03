@@ -815,7 +815,7 @@
 const tree = {
   id: 'start',
   step: 'STEP 1 / 7',
-  question: 'Is the service/activity ICT (Information & Communications Technology) in nature?',
+  question: 'Does this arrangement involve ICT services — software, cloud, data centres, networks, or IT-based processing?',
   hint: 'YES: SaaS, cloud hosting, data centres, IT security, payment processing, core banking systems.<br>NO: physical security, cleaning, consulting without system access, facility management.',
   answers: [
     {
@@ -855,7 +855,7 @@ const nodes = {
   'q3_cloud_cif': {
     step: 'STEP 3 / 8',
     question: 'Does this cloud service support a critical or important function of the institution (CIF)?',
-    hint: 'YES: core banking in cloud, payment processing, AML/KYC, trading platforms, customer-facing digital channels.<br>NO: internal HR tools, non-critical analytics, developer tooling.',
+    hint: 'YES: core banking, payment processing, AML/KYC, fraud detection, risk management, regulatory reporting, trading platforms, customer-facing digital channels, identity and authentication systems, credit decisioning.<br>NO: internal HR tools, payroll, non-critical analytics, internal communication platforms, facility management systems.',
     answers: [
       { label: 'YES — supports a CIF', type: 'yes', next: 'q3b_cloud_ctpp' },
       { label: 'NO — does not support a CIF', type: 'no', next: 'q3c_cloud_noncif' }
@@ -915,7 +915,7 @@ const nodes = {
   'q4_critical_func': {
     step: 'STEP 4 / 7',
     question: 'Does the service support a critical or important function of the institution (CIF)?',
-    hint: 'YES: core banking, payments, trading, risk management, AML/KYC, customer-facing channels.<br>NO: internal helpdesk, HR systems, non-critical reporting.',
+    hint: 'YES: core banking, payment processing, AML/KYC, fraud detection, risk management, regulatory reporting, trading platforms, customer-facing digital channels, identity and authentication systems, credit decisioning.<br>NO: internal HR tools, payroll, non-critical analytics, internal communication platforms, facility management systems.',
     answers: [
       { label: 'YES — supports a CIF', type: 'yes', next: 'q5_intragroup' },
       { label: 'NO — does not support a CIF', type: 'no', next: 'q_material_non_cif' }
@@ -985,7 +985,7 @@ const nodes = {
   'q_non_ict_cif': {
     step: 'STEP 4 / 6',
     question: 'Does the service support a critical or important function of the institution?',
-    hint: 'YES: compliance function, internal audit, credit analysis, back-office linked to client services.<br>NO: general admin, facilities, non-critical procurement.',
+    hint: 'YES: core banking, payment processing, AML/KYC, fraud detection, risk management, regulatory reporting, trading platforms, customer-facing digital channels, identity and authentication systems, credit decisioning.<br>NO: internal HR tools, payroll, non-critical analytics, internal communication platforms, facility management systems.',
     answers: [
       { label: 'YES — supports a critical or important function', type: 'yes', next: 'q_non_ict_cif_intragroup' },
       { label: 'NO — does not support a CIF', type: 'no', next: 'q_non_ict_material_non_cif_intragroup' }
