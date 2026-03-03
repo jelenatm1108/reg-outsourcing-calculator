@@ -848,7 +848,7 @@ const nodes = {
     hint: 'YES: core banking, risk systems, AML, payments, IT development, helpdesk.<br>NO: electricity, telecom infrastructure, commodity software licences.',
     answers: [
       { label: 'YES — the institution would do this itself', type: 'yes', next: 'q3_material' },
-      { label: 'NO — the institution would not do this itself', type: 'no', next: 'q_external_procurement_ict' }
+      { label: 'NO — the institution would not do this itself', type: 'no', next: 'q_professional_services_check' }
     ]
   },
 
@@ -968,7 +968,27 @@ const nodes = {
     hint: 'YES: credit analysts, compliance, internal audit, back-office processing, call centre.<br>NO: cleaning, physical security, catering, transport.',
     answers: [
       { label: 'YES — the institution would do this itself', type: 'yes', next: 'q_non_ict_material' },
-      { label: 'NO — the institution would not do this', type: 'no', next: 'result_external_procurement' }
+      { label: 'NO — the institution would not do this', type: 'no', next: 'q_professional_services_check' }
+    ]
+  },
+
+  'q_professional_services_check': {
+    step: 'STEP 3 / 5',
+    question: 'Does the service involve access to the institution\'s systems, customer data, or delivery of a regulated function?',
+    hint: 'YES: consultancy with system access, marketing agency with CRM access, hiring platform with employee data, interim compliance officer, outsourced internal audit.<br>NO: cleaning, catering, travel management, office supplies, pure strategy consultancy without system access.',
+    answers: [
+      { label: 'YES — system/data access or regulated function', type: 'yes', next: 'q_professional_services_regulated' },
+      { label: 'NO — no access, no regulated function', type: 'no', next: 'result_external_procurement' }
+    ]
+  },
+
+  'q_professional_services_regulated': {
+    step: 'STEP 4 / 5',
+    question: 'Does the service deliver or substitute a regulated function of the institution?',
+    hint: 'YES: interim compliance officer, outsourced internal audit, outsourced risk management, outsourced AML function.<br>NO: marketing agency with CRM access, recruitment platform, travel tool with employee data, IT consultancy with read-only system access.',
+    answers: [
+      { label: 'YES — delivers a regulated function', type: 'yes', next: 'q_non_ict_material' },
+      { label: 'NO — system access only, no regulated function', type: 'no', next: 'result_external_procurement_data' }
     ]
   },
 
@@ -1342,6 +1362,34 @@ const results = {
       { text: 'Confirm no ICT components or system access are involved', tag: 'ops' },
       { text: 'GDPR obligations checked — if personal data processed, DPA required', tag: 'legal' },
       { text: 'Note: if scope changes to include ICT or system access, re-classify immediately', tag: 'ops' }
+    ]
+  },
+
+  'result_external_procurement_data': {
+    title: 'EXTERNAL PROCUREMENT — Data Protection Obligations Apply',
+    alert: { type: 'warning', text: 'This arrangement is outside the outsourcing scope but involves access to systems, customer data, or personal data. GDPR and data protection obligations apply.' },
+    classifications: [
+      { type: 'marisk', label: 'MaRisk AT 9', value: 'Outside outsourcing scope' },
+      { type: 'dora', label: 'DORA', value: 'Outside DORA scope unless ICT component exists' },
+      { type: 'eba', label: 'EBA GL', value: 'Outside outsourcing definition' }
+    ],
+    implications: [
+      'GDPR Data Processing Agreement required if personal data is processed',
+      'Information security clauses proportional to the level of system or data access',
+      'Access rights must be documented and limited to minimum necessary',
+      'Periodic review of access scope recommended',
+      'If an ICT component is identified, re-classify via the ICT path',
+      'Institution-level DORA obligations (Art. 6, Art. 28) apply regardless'
+    ],
+    examples: ['Marketing agency with CRM access', 'Recruitment platform', 'Travel management tool', 'IT consultancy with read-only access'],
+    bafin: '<strong>No BaFin notification required.</strong> This arrangement falls outside the outsourcing definition. However, GDPR and data protection obligations apply where personal data is processed. If a regulated function or ICT component is identified, re-classify immediately.',
+    checklist: [
+      { text: 'GDPR DPA drafted and signed if personal data is processed', tag: 'legal' },
+      { text: 'Data access scope documented and limited to minimum necessary', tag: 'risk' },
+      { text: 'Information security clauses included in contract', tag: 'legal' },
+      { text: 'Periodic access review scheduled', tag: 'ops' },
+      { text: 'Confirm no regulated function is being delivered — if yes re-classify immediately', tag: 'ops' },
+      { text: 'Confirm no ICT component exists — if yes re-classify via ICT path', tag: 'ops' }
     ]
   },
 
@@ -1863,12 +1911,6 @@ function renderResult(container, result) {
 
   const bafinHtml = getBafinHtml(result);
 
-  const timelineHtml = result.timeline ? `
-    <div class="timeline-banner">
-      <div class="tl-icon">⏱</div>
-      <div><strong>Expected timeline:</strong> ${result.timeline}</div>
-    </div>` : '';
-
   const checklistHtml = result.checklist ? `
     <div class="checklist-section">
       <div class="checklist-title">What to prepare before contracting</div>
@@ -1893,7 +1935,6 @@ function renderResult(container, result) {
       ${nonEuHtml}
       ${ctppHtml}
       ${bafinHtml}
-      ${timelineHtml}
       <div class="classification-grid">
         ${result.classifications.map(c => `
           <div class="class-badge ${c.type}">
