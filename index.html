@@ -787,7 +787,7 @@
   <header>
     <div class="header-tag">Classification tool</div>
     <h1>MaRisk · DORA · <span>EBA GL</span></h1>
-    <p class="subtitle">Interactive decision tree for classifying external services and arrangements</p>
+    <p class="subtitle">Interactive decision tree for classifying external and intra-group services and arrangements.</p>
     <div class="legend">
       <div class="legend-item"><div class="legend-dot" style="background:var(--marisk-color)"></div> MaRisk AT 9</div>
       <div class="legend-item"><div class="legend-dot" style="background:var(--dora-color)"></div> DORA EU 2022/2554</div>
@@ -835,26 +835,26 @@ const nodes = {
   'q2_ict': {
     step: 'STEP 2 / 8',
     question: 'Is this service cloud-based (hosted by a third-party cloud provider)?',
-    hint: 'YES: public cloud (AWS, Azure, GCP), SaaS on third-party infrastructure, hybrid with external components.<br>NO: on-premise servers, bank-owned data centres.',
+    hint: 'YES: public cloud (AWS, Azure, GCP), SaaS on third-party infrastructure, hybrid with external components.<br>NO: on-premise servers, institution-owned data centres.',
     answers: [
       { label: 'YES — cloud-based service', type: 'yes', next: 'q3_cloud_cif' },
-      { label: 'NO — not cloud (on-premise or bank-owned)', type: 'no', next: 'q2b_ict' }
+      { label: 'NO — not cloud (on-premise or institution-owned)', type: 'no', next: 'q2b_ict' }
     ]
   },
 
   'q2b_ict': {
     step: 'STEP 3 / 8',
-    question: 'Is this an activity the bank would normally perform itself, or would otherwise have to perform?',
+    question: 'Is this an activity the institution would normally perform itself, or would otherwise have to perform?',
     hint: 'YES: core banking, risk systems, AML, payments, IT development, helpdesk.<br>NO: electricity, telecom infrastructure, commodity software licences.',
     answers: [
-      { label: 'YES — the bank would do this itself', type: 'yes', next: 'q3_material' },
-      { label: 'NO — the bank would not do this itself', type: 'no', next: 'q_external_procurement_ict' }
+      { label: 'YES — the institution would do this itself', type: 'yes', next: 'q3_material' },
+      { label: 'NO — the institution would not do this itself', type: 'no', next: 'q_external_procurement_ict' }
     ]
   },
 
   'q3_cloud_cif': {
     step: 'STEP 3 / 8',
-    question: 'Does this cloud service support a critical or important function of the bank (CIF)?',
+    question: 'Does this cloud service support a critical or important function of the institution (CIF)?',
     hint: 'YES: core banking in cloud, payment processing, AML/KYC, trading platforms, customer-facing digital channels.<br>NO: internal HR tools, non-critical analytics, developer tooling.',
     answers: [
       { label: 'YES — supports a CIF', type: 'yes', next: 'q3b_cloud_ctpp' },
@@ -904,7 +904,7 @@ const nodes = {
 
   'q3_material': {
     step: 'STEP 4 / 8',
-    question: 'Could an outage or poor quality of this service materially harm the bank?',
+    question: 'Could an outage or poor quality of this service materially harm the institution?',
     hint: 'YES: disruption to client services, regulatory breach risk, financial loss, reputational damage.<br>NO: internal tool, easily replaced, no client or regulatory impact.',
     answers: [
       { label: 'YES — material impact', type: 'yes', next: 'q4_critical_func' },
@@ -914,7 +914,7 @@ const nodes = {
 
   'q4_critical_func': {
     step: 'STEP 4 / 7',
-    question: 'Does the service support a critical or important function of the bank (CIF)?',
+    question: 'Does the service support a critical or important function of the institution (CIF)?',
     hint: 'YES: core banking, payments, trading, risk management, AML/KYC, customer-facing channels.<br>NO: internal helpdesk, HR systems, non-critical reporting.',
     answers: [
       { label: 'YES — supports a CIF', type: 'yes', next: 'q5_intragroup' },
@@ -964,17 +964,17 @@ const nodes = {
 
   'q_non_ict': {
     step: 'STEP 2 / 4',
-    question: 'Is this an activity the bank would normally perform itself, or would otherwise have to perform?',
+    question: 'Is this an activity the institution would normally perform itself, or would otherwise have to perform?',
     hint: 'YES: credit analysts, compliance, internal audit, back-office processing, call centre.<br>NO: cleaning, physical security, catering, transport.',
     answers: [
-      { label: 'YES — the bank would do this itself', type: 'yes', next: 'q_non_ict_material' },
-      { label: 'NO — the bank would not do this', type: 'no', next: 'result_external_procurement' }
+      { label: 'YES — the institution would do this itself', type: 'yes', next: 'q_non_ict_material' },
+      { label: 'NO — the institution would not do this', type: 'no', next: 'result_external_procurement' }
     ]
   },
 
   'q_non_ict_material': {
     step: 'STEP 3 / 4',
-    question: 'Could an outage materially harm the bank?',
+    question: 'Could an outage materially harm the institution?',
     hint: 'YES: service failure would disrupt client services, trigger regulatory breach, or cause financial loss.<br>NO: service can be replaced quickly with no material client or regulatory impact.',
     answers: [
       { label: 'YES — material impact', type: 'yes', next: 'q_non_ict_cif' },
@@ -1044,8 +1044,8 @@ const nodes = {
 
   'q_non_material': {
     step: 'STEP 4 / 5',
-    question: "Does the ICT service still have access to the bank's systems or data?",
-    hint: 'YES: vendor has read/write access to bank systems or data.<br>NO: standalone service with no integration to bank infrastructure.',
+    question: "Does the ICT service still have access to the institution's systems or data?",
+    hint: 'YES: vendor has read/write access to institution systems or data.<br>NO: standalone service with no integration to institution infrastructure.',
     answers: [
       { label: 'YES — has access to systems/data', type: 'yes', next: 'result_non_material_ict' },
       { label: 'NO — no access', type: 'no', next: 'result_non_material_no_access' }
@@ -1075,13 +1075,13 @@ const results = {
     ],
     implications: [
       'Formal contract with ALL Art. 30(2) and Art. 30(3) clauses',
-      'Unrestricted audit rights (bank, third parties, regulators)',
+      'Unrestricted audit rights (institution, third parties, regulators)',
       'Documented exit strategy — tested and kept up to date',
       'Annual management report on this arrangement',
       'Monitoring of CTPP designation and changes in the ESA list',
       'TLPT cooperation clause in the contract (Art. 26–27)',
       'Incident notification in the contract — aligned with DORA Art. 19 timelines',
-      "Sub-outsourcing approval — no critical sub-outsourcing without the bank's prior approval",
+      'Sub-outsourcing approval — no critical sub-outsourcing without the institution\'s prior approval',
       'MaRisk outsourcing officer (Auslagerungsbeauftragter) must be involved',
       'Concentration risk assessment and ongoing monitoring'
     ],
@@ -1115,12 +1115,12 @@ const results = {
     ],
     implications: [
       'Formal contract with Art. 30(2) + Art. 30(3) clauses',
-      'Audit rights — bank, third parties, regulators',
+      'Audit rights — institution, third parties, regulators',
       'Documented and tested exit strategy',
       'Annual management report',
       'Sub-outsourcing controls and approvals',
       'TLPT cooperation clause',
-      'Vendor obligation to notify the bank about incidents',
+      'Vendor obligation to notify the institution about incidents',
       'BCP (Business Continuity Plan) requirement for the vendor',
       'MaRisk outsourcing officer involved'
     ],
@@ -1136,7 +1136,7 @@ const results = {
       { text: 'Exit strategy documented and approved', tag: 'ops' },
       { text: 'Sub-outsourcing list reviewed and approved', tag: 'ops' },
       { text: 'TLPT cooperation clause included', tag: 'legal' },
-      { text: 'Vendor BCP reviewed and adequate for bank\'s RTO/RPO', tag: 'risk' },
+      { text: 'Vendor BCP reviewed and adequate for institution\'s RTO/RPO', tag: 'risk' },
       { text: 'Management sign-off from Auslagerungsbeauftragter', tag: 'mgmt' },
       { text: 'Register of Information entry prepared', tag: 'ops' }
     ]
@@ -1184,8 +1184,8 @@ const results = {
       { type: 'eba', label: 'EBA GL', value: 'Critical function + sub-contractor requirements' }
     ],
     implications: [
-      'Map the full chain: bank → intra-group entity → external vendor',
-      'Formal approval of each external sub-vendor by the bank',
+      'Map the full chain: institution → intra-group entity → external vendor',
+      'Formal approval of each external sub-vendor by the institution',
       'Sub-outsourcing clause must be included in the intra-group contract',
       'Register must show the sub-outsourcing chain',
       'External vendor is subject to the same requirements as a direct vendor',
@@ -1193,12 +1193,12 @@ const results = {
       'Exit strategy must cover scenarios where the external vendor fails'
     ],
     examples: ['Group IT company using AWS', 'Intra-group payment entity using SWIFT'],
-    ctpp: 'The external sub-vendor may be a hyperscaler or potential CTPP. <strong>Assess concentration risk across the full chain</strong> — bank → intra-group entity → external vendor. If the sub-vendor is AWS/Azure/GCP, CTPP monitoring obligations apply at the end of the chain.',
+    ctpp: 'The external sub-vendor may be a hyperscaler or potential CTPP. <strong>Assess concentration risk across the full chain</strong> — institution → intra-group entity → external vendor. If the sub-vendor is AWS/Azure/GCP, CTPP monitoring obligations apply at the end of the chain.',
     bafin: '<strong>Notification required.</strong> The arrangement is material outsourcing with sub-outsourcing. BaFin must be notified before go-live. The sub-outsourcing chain must be disclosed in the notification. Approval of each external sub-vendor must be documented.',
     timeline: 'Expect 2–4 months. The external sub-vendor adds complexity — BaFin notification must cover the full chain.',
     checklist: [
-      { text: 'Full outsourcing chain mapped: bank → group entity → external vendor', tag: 'ops' },
-      { text: 'External sub-vendor approved by the bank formally', tag: 'mgmt' },
+      { text: 'Full outsourcing chain mapped: institution → group entity → external vendor', tag: 'ops' },
+      { text: 'External sub-vendor approved by the institution formally', tag: 'mgmt' },
       { text: 'Sub-outsourcing clause in the intra-group SLA — rights flow through', tag: 'legal' },
       { text: 'External vendor subject to equivalent contractual requirements', tag: 'legal' },
       { text: 'Register of Information shows the full chain', tag: 'ops' },
