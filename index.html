@@ -832,6 +832,16 @@ const tree = {
 };
 
 const nodes = {
+  'q_reassessment_materiality_change': {
+    step: 'REASSESSMENT — STEP 1',
+    question: 'Has the materiality of this arrangement changed since the last assessment?',
+    hint: '<strong>YES:</strong> scope expanded significantly, new functions added, dependency increased, provider became CTPP.<br><strong>NO:</strong> arrangement unchanged, same scope, same provider, same risk profile.',
+    answers: [
+      { label: 'YES — materiality or scope has changed', type: 'yes', next: 'start', action: 'setMaterialityTrue' },
+      { label: 'NO — same classification as before', type: 'no', next: 'start', action: 'setMaterialityFalse' }
+    ]
+  },
+
   'q2_ict': {
     step: 'STEP 2 / 8',
     question: 'Is this service cloud-based (hosted by a third-party cloud provider)?',
@@ -1140,7 +1150,7 @@ const results = {
     alert: { type: 'critical', text: 'This is the highest level of regulatory treatment: maximum across all three dimensions + potential CTPP oversight.' },
     classifications: [
       { type: 'marisk', label: 'MaRisk AT 9', value: 'Material outsourcing (Material outsourcing)' },
-      { type: 'dora', label: 'DORA', value: 'ICT Third-Party — CIF' },
+      { type: 'dora', label: 'DORA', value: 'DORA Art. 30(2) + Art. 30(3)' },
       { type: 'eba', label: 'EBA GL', value: 'Critical/Important Function' }
     ],
     implications: [
@@ -1180,7 +1190,7 @@ const results = {
     alert: { type: 'warning', text: 'Material outsourcing + DORA CIF. Full outsourcing and DORA requirements without the CTPP dimension.' },
     classifications: [
       { type: 'marisk', label: 'MaRisk AT 9', value: 'Material outsourcing (Material outsourcing)' },
-      { type: 'dora', label: 'DORA', value: 'ICT Third-Party — CIF' },
+      { type: 'dora', label: 'DORA', value: 'DORA Art. 30(2) + Art. 30(3)' },
       { type: 'eba', label: 'EBA GL', value: 'Critical/Important Function' }
     ],
     implications: [
@@ -1218,7 +1228,7 @@ const results = {
     alert: { type: 'warning', text: 'Intra-group status does not exempt you from requirements. A contract and formal audit rights are still mandatory.' },
     classifications: [
       { type: 'marisk', label: 'MaRisk AT 9', value: 'Material outsourcing (intra-group)' },
-      { type: 'dora', label: 'DORA', value: 'ICT Third-Party — CIF (intra-group)' },
+      { type: 'dora', label: 'DORA', value: 'DORA Art. 30(2) + Art. 30(3)' },
       { type: 'eba', label: 'EBA GL', value: 'Critical function (intra-group — slightly simplified)' }
     ],
     implications: [
@@ -1250,7 +1260,7 @@ const results = {
     alert: { type: 'critical', text: 'Sub-outsourcing to an external vendor — you remain responsible for the entire chain. Visibility is mandatory.' },
     classifications: [
       { type: 'marisk', label: 'MaRisk AT 9', value: 'Material outsourcing (with sub-outsourcing)' },
-      { type: 'dora', label: 'DORA', value: 'CIF — sub-outsourcing chain' },
+      { type: 'dora', label: 'DORA', value: 'DORA Art. 30(2) + Art. 30(3)' },
       { type: 'eba', label: 'EBA GL', value: 'Critical function + sub-contractor requirements' }
     ],
     implications: [
@@ -1283,7 +1293,7 @@ const results = {
     title: 'MATERIAL OUTSOURCING — non-CIF',
     classifications: [
       { type: 'marisk', label: 'MaRisk AT 9', value: 'Material outsourcing (Material outsourcing)' },
-      { type: 'dora', label: 'DORA', value: 'ICT Third-Party — non-CIF' },
+      { type: 'dora', label: 'DORA', value: 'DORA Art. 30(2)' },
       { type: 'eba', label: 'EBA GL', value: 'Non-critical function' }
     ],
     implications: [
@@ -1320,7 +1330,7 @@ const results = {
     alert: { type: 'warning', text: 'Access to customer data still requires enhanced security clauses even if the service is not CIF.' },
     classifications: [
       { type: 'marisk', label: 'MaRisk AT 9', value: 'Material outsourcing (Material outsourcing)' },
-      { type: 'dora', label: 'DORA', value: 'ICT Third-Party — non-CIF (with data access)' },
+      { type: 'dora', label: 'DORA', value: 'DORA Art. 30(2)' },
       { type: 'eba', label: 'EBA GL', value: 'Non-critical + data protection requirements' }
     ],
     implications: [
@@ -1358,7 +1368,7 @@ const results = {
     title: 'NON-MATERIAL OUTSOURCING — included in the DORA register',
     classifications: [
       { type: 'marisk', label: 'MaRisk AT 9', value: 'Non-material outsourcing (Non-material outsourcing)' },
-      { type: 'dora', label: 'DORA', value: 'ICT Third-Party — non-CIF' },
+      { type: 'dora', label: 'DORA', value: 'DORA Art. 30(2)' },
       { type: 'eba', label: 'EBA GL', value: 'Non-critical' }
     ],
     implications: [
@@ -1384,7 +1394,7 @@ const results = {
     title: 'NON-MATERIAL OUTSOURCING',
     classifications: [
       { type: 'marisk', label: 'MaRisk AT 9', value: 'Non-material outsourcing (Non-material outsourcing)' },
-      { type: 'dora', label: 'DORA', value: 'ICT Third-Party — non-CIF (minimal scope)' },
+      { type: 'dora', label: 'DORA', value: 'DORA Art. 30(2)' },
       { type: 'eba', label: 'EBA GL', value: 'Non-critical' }
     ],
     implications: [
@@ -1404,11 +1414,43 @@ const results = {
     ]
   },
 
+  'result_non_material_ict_data': {
+    title: 'NON-MATERIAL OUTSOURCING — with data access',
+    alert: { type: 'warning', text: 'Non-material outsourcing, but the vendor has access to customer or personal data. GDPR and data protection obligations apply alongside the DORA register requirement.' },
+    classifications: [
+      { type: 'marisk', label: 'MaRisk AT 9', value: 'Non-material outsourcing (Non-material outsourcing)' },
+      { type: 'dora', label: 'DORA', value: 'DORA Art. 30(2)' },
+      { type: 'eba', label: 'EBA GL', value: 'Non-critical' }
+    ],
+    implications: [
+      'Contract with Art. 30(2) clauses — minimum DORA requirement',
+      'GDPR Data Processing Agreement required if personal data is processed',
+      'Information security clauses proportional to the data access level',
+      'Data access scope must be documented and limited to minimum necessary',
+      'Included in the Register of Information (DORA requirement)',
+      'Incident notification clause recommended for data breach scenarios',
+      'Classification must be re-evaluated if the scope or data access expands'
+    ],
+    examples: ['Analytics tool with read access to transaction data', 'External HR platform with employee data', 'Non-critical reporting tool with customer data export'],
+    bafin: '<strong>No BaFin notification required.</strong> Non-material outsourcing is below the notification threshold. However, GDPR obligations apply where personal data is processed and a DORA Register of Information entry is required. Re-evaluate if scope expands.',
+    timeline: 'Expect 2–4 weeks. Light outsourcing process but GDPR review and register entry are mandatory.',
+    checklist: [
+      { text: 'Contract with Art. 30(2) minimum clauses confirmed', tag: 'legal' },
+      { text: 'GDPR Data Processing Agreement (DPA) drafted and signed', tag: 'legal' },
+      { text: 'Data access scope documented and limited to minimum necessary', tag: 'risk' },
+      { text: 'Information security clauses included proportional to data access level', tag: 'legal' },
+      { text: 'Incident notification clause included (recommended for data breach scenarios)', tag: 'legal' },
+      { text: 'Register of Information entry prepared — mandatory for ICT services', tag: 'ops' },
+      { text: 'Re-evaluation trigger set if scope or data access expands', tag: 'ops' },
+      { text: 'Standard vendor management process initiated', tag: 'ops' }
+    ]
+  },
+
   'result_external_procurement': {
     title: 'OTHER EXTERNAL PROCUREMENT — outside outsourcing scope',
     classifications: [
       { type: 'marisk', label: 'MaRisk AT 9', value: 'Other external procurement (not outsourcing)' },
-      { type: 'dora', label: 'DORA', value: 'Outside DORA scope' },
+      { type: 'dora', label: 'DORA', value: 'DORA Art. 30 N/A — verify no ICT components exist' },
       { type: 'eba', label: 'EBA GL', value: 'Outside outsourcing definition' }
     ],
     implications: [
@@ -1433,7 +1475,7 @@ const results = {
     alert: { type: 'warning', text: 'This arrangement is outside the outsourcing scope but involves access to systems, customer data, or personal data. GDPR and data protection obligations apply.' },
     classifications: [
       { type: 'marisk', label: 'MaRisk AT 9', value: 'Outside outsourcing scope' },
-      { type: 'dora', label: 'DORA', value: 'Outside DORA scope unless ICT component exists' },
+      { type: 'dora', label: 'DORA', value: 'DORA Art. 30 N/A — verify no ICT components exist' },
       { type: 'eba', label: 'EBA GL', value: 'Outside outsourcing definition' }
     ],
     implications: [
@@ -1461,7 +1503,7 @@ const results = {
     alert: { type: 'warning', text: 'Not MaRisk outsourcing, but under DORA this is an ICT arrangement supporting a critical function. DORA requirements apply.' },
     classifications: [
       { type: 'marisk', label: 'MaRisk AT 9', value: 'Other external procurement' },
-      { type: 'dora', label: 'DORA', value: 'ICT Third-Party — CIF (!!)' },
+      { type: 'dora', label: 'DORA', value: 'DORA Art. 30(2) + Art. 30(3)' },
       { type: 'eba', label: 'EBA GL', value: 'Outside outsourcing — but DORA Art. 30(3)' }
     ],
     implications: [
@@ -1490,7 +1532,7 @@ const results = {
     title: 'OTHER EXTERNAL PROCUREMENT — DORA non-CIF',
     classifications: [
       { type: 'marisk', label: 'MaRisk AT 9', value: 'Other external procurement' },
-      { type: 'dora', label: 'DORA', value: 'ICT Third-Party — non-CIF' },
+      { type: 'dora', label: 'DORA', value: 'DORA Art. 30(2)' },
       { type: 'eba', label: 'EBA GL', value: 'Outside outsourcing definition' }
     ],
     implications: [
@@ -1515,7 +1557,7 @@ const results = {
     title: 'MATERIAL OUTSOURCING — non-ICT',
     classifications: [
       { type: 'marisk', label: 'MaRisk AT 9', value: 'Material outsourcing (non-ICT)' },
-      { type: 'dora', label: 'DORA', value: 'Outside DORA scope' },
+      { type: 'dora', label: 'DORA', value: 'DORA Art. 30 N/A — verify no ICT components exist' },
       { type: 'eba', label: 'EBA GL', value: 'Critical/Important (non-ICT)' }
     ],
     implications: [
@@ -1545,7 +1587,7 @@ const results = {
     title: 'NON-MATERIAL OUTSOURCING — non-ICT',
     classifications: [
       { type: 'marisk', label: 'MaRisk AT 9', value: 'Non-material outsourcing (Non-material outsourcing)' },
-      { type: 'dora', label: 'DORA', value: 'Outside DORA scope' },
+      { type: 'dora', label: 'DORA', value: 'DORA Art. 30 N/A — verify no ICT components exist' },
       { type: 'eba', label: 'EBA GL', value: 'Non-critical (non-ICT)' }
     ],
     implications: [
@@ -1572,7 +1614,7 @@ const results = {
     alert: { type: 'warning', text: 'Full MaRisk AT 9 and EBA GL requirements apply. DORA ICT-specific requirements do not apply to this arrangement. Institution-level DORA obligations (Art. 6, Art. 28) apply regardless.' },
     classifications: [
       { type: 'marisk', label: 'MaRisk AT 9', value: 'Material outsourcing (non-ICT CIF)' },
-      { type: 'dora', label: 'DORA', value: 'Outside DORA scope' },
+      { type: 'dora', label: 'DORA', value: 'DORA Art. 30 N/A — verify no ICT components exist' },
       { type: 'eba', label: 'EBA GL', value: 'Critical/Important Function (non-ICT)' }
     ],
     implications: [
@@ -1608,7 +1650,7 @@ const results = {
     alert: { type: 'warning', text: 'Intra-group status does not exempt this arrangement from MaRisk AT 9 requirements.' },
     classifications: [
       { type: 'marisk', label: 'MaRisk AT 9', value: 'Material outsourcing intra-group (non-ICT)' },
-      { type: 'dora', label: 'DORA', value: 'Outside DORA scope' },
+      { type: 'dora', label: 'DORA', value: 'DORA Art. 30 N/A — verify no ICT components exist' },
       { type: 'eba', label: 'EBA GL', value: 'Critical function intra-group (simplified due diligence permitted)' }
     ],
     implications: [
@@ -1640,7 +1682,7 @@ const results = {
     alert: { type: 'critical', text: 'Sub-outsourcing to an external vendor — you remain responsible for the entire chain.' },
     classifications: [
       { type: 'marisk', label: 'MaRisk AT 9', value: 'Material outsourcing with sub-outsourcing (non-ICT)' },
-      { type: 'dora', label: 'DORA', value: 'Outside DORA scope' },
+      { type: 'dora', label: 'DORA', value: 'DORA Art. 30 N/A — verify no ICT components exist' },
       { type: 'eba', label: 'EBA GL', value: 'Critical function with sub-contractor requirements' }
     ],
     implications: [
@@ -1669,7 +1711,7 @@ const results = {
     title: 'INTRA-GROUP — MATERIAL OUTSOURCING, non-ICT non-CIF',
     classifications: [
       { type: 'marisk', label: 'MaRisk AT 9', value: 'Material outsourcing intra-group (non-ICT non-CIF)' },
-      { type: 'dora', label: 'DORA', value: 'Outside DORA scope' },
+      { type: 'dora', label: 'DORA', value: 'DORA Art. 30 N/A — verify no ICT components exist' },
       { type: 'eba', label: 'EBA GL', value: 'Non-critical function intra-group' }
     ],
     implications: [
@@ -1785,7 +1827,7 @@ const results = {
     title: 'NON-MATERIAL OUTSOURCING — intra-group, non-ICT',
     classifications: [
       { type: 'marisk', label: 'MaRisk AT 9', value: 'Non-material outsourcing intra-group (non-ICT)' },
-      { type: 'dora', label: 'DORA', value: 'Outside DORA scope' },
+      { type: 'dora', label: 'DORA', value: 'DORA Art. 30 N/A — verify no ICT components exist' },
       { type: 'eba', label: 'EBA GL', value: 'Non-critical intra-group' }
     ],
     implications: [
@@ -1808,7 +1850,7 @@ const results = {
 let history = [];
 let currentNode = null;
 let arrangementType = null; // 'new' or 'reassess'
-let materialityChanged = null; // true/false — only for reassess path
+let materialityChanged = true; // true/false — only for reassess path; defaults to true (BaFin shown unless explicitly no change)
 let nonEuProvider = false; // true if ICT CIF external provider is outside the EU
 let isReassessment = false; // true if user selected Reassessment path
 let checkboxCounter = 0;
@@ -1938,9 +1980,9 @@ function renderReassessChange(container) {
 function setArrangementType(type) {
   arrangementType = type;
   isReassessment = (type === 'reassess');
-  materialityChanged = null;
+  materialityChanged = true;
   history = [];
-  currentNode = 'start';
+  currentNode = isReassessment ? 'q_reassessment_materiality_change' : 'start';
   render();
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
@@ -2071,7 +2113,7 @@ function renderResult(container, result) {
       </div>
     </div>` : '';
 
-  const bafinHtml = isReassessment ? '' : getBafinHtml(result);
+  const bafinHtml = (isReassessment && materialityChanged === false) ? '' : getBafinHtml(result);
 
   const reassessmentChecklist = [
     { text: 'Previous classification reviewed and confirmed as still valid', tag: 'ops' },
@@ -2085,8 +2127,8 @@ function renderResult(container, result) {
     { text: 'Outsourcing Officer sign-off on reassessment outcome obtained', tag: 'mgmt' },
     { text: 'No BaFin notification required — confirmed and documented in writing', tag: 'mgmt' }
   ];
-  const activeChecklist = isReassessment ? reassessmentChecklist : result.checklist;
-  const checklistTitle = isReassessment ? 'REASSESSMENT CHECKLIST' : 'What to prepare before contracting';
+  const activeChecklist = (isReassessment && materialityChanged === false) ? reassessmentChecklist : result.checklist;
+  const checklistTitle = (isReassessment && materialityChanged === false) ? 'REASSESSMENT CHECKLIST' : 'What to prepare before contracting';
 
   const checklistHtml = activeChecklist ? `
     <div class="checklist-section">
@@ -2144,13 +2186,8 @@ function renderResult(container, result) {
 
 function answer(nextId, label, action) {
   if (action === 'setNonEuProvider') nonEuProvider = true;
-  if (arrangementType === 'reassess' && isResult(nextId) && materialityChanged === null) {
-    history.push({ node: currentNode, answerLabel: label, nextResult: nextId });
-    currentNode = REASSESS_CHANGE;
-    render();
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-    return;
-  }
+  if (action === 'setMaterialityTrue') materialityChanged = true;
+  if (action === 'setMaterialityFalse') materialityChanged = false;
   history.push({ node: currentNode, answerLabel: label });
   currentNode = nextId;
   render();
@@ -2162,7 +2199,7 @@ function goBack() {
     currentNode = LANDING;
     arrangementType = null;
     isReassessment = false;
-    materialityChanged = null;
+    materialityChanged = true;
     nonEuProvider = false;
     render();
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -2170,8 +2207,9 @@ function goBack() {
   }
   const prev = history.pop();
   if (currentNode === REASSESS_CHANGE || prev.nextResult) {
-    materialityChanged = null;
+    materialityChanged = true;
   }
+  if (prev.node === 'q_reassessment_materiality_change') materialityChanged = true;
   if (prev.node === 'q_non_eu_provider') nonEuProvider = false;
   currentNode = prev.node;
   render();
@@ -2183,7 +2221,7 @@ function restart() {
   currentNode = LANDING;
   arrangementType = null;
   isReassessment = false;
-  materialityChanged = null;
+  materialityChanged = true;
   nonEuProvider = false;
   render();
   window.scrollTo({ top: 0, behavior: 'smooth' });
