@@ -1163,7 +1163,8 @@ const results = {
       'Incident notification in the contract — aligned with DORA Art. 19 timelines',
       'Sub-outsourcing approval — no critical sub-outsourcing without the institution\'s prior approval',
       'MaRisk outsourcing officer (Outsourcing Officer) must be involved',
-      'Concentration risk assessment and ongoing monitoring'
+      'Concentration risk assessment and ongoing monitoring',
+      'Assess substitutability — document whether this service can be replaced within a reasonable timeframe if the provider fails or terminates. DORA Art. 28(2).'
     ],
     examples: ['AWS / Azure / GCP', 'Core banking vendor', 'Payment processor', 'Oracle Cloud'],
     ctpp: 'This provider is a potential <strong>Critical Third-Party Provider (CTPP)</strong>. Monitor the ESA CTPP designation list (published by EBA/ESMA/EIOPA). Assess your institution\'s <strong>concentration risk</strong> — how dependent are you on this single provider across functions? A CTPP designation triggers additional supervisory oversight under DORA Art. 31–44. Include concentration risk assessment in your annual management report.',
@@ -1180,7 +1181,8 @@ const results = {
       { text: 'Management sign-off obtained (Outsourcing Officer + board-level if required)', tag: 'mgmt' },
       { text: 'BaFin notification assessed — check if prior notification required', tag: 'mgmt' },
       { text: 'Entry prepared for Register of Information (DORA)', tag: 'ops' },
-      { text: 'Concentration risk assessed — check group-level exposure to this vendor', tag: 'risk' }
+      { text: 'Concentration risk assessed — check group-level exposure to this vendor', tag: 'risk' },
+      { text: 'Substitutability assessment documented', tag: 'risk' }
     ]
   },
 
@@ -1202,7 +1204,8 @@ const results = {
       'TLPT cooperation clause',
       'Vendor obligation to notify the institution about incidents',
       'BCP (Business Continuity Plan) requirement for the vendor',
-      'MaRisk outsourcing officer involved'
+      'MaRisk outsourcing officer involved',
+      'Assess substitutability — document whether this service can be replaced within a reasonable timeframe if the provider fails or terminates. DORA Art. 28(2).'
     ],
     examples: ['Specialised AML vendor', 'Risk engine provider', 'Digital banking platform', 'Core banking (non-CTPP)'],
     ctpp: 'Although this provider is not a hyperscaler, <strong>assess concentration risk</strong> — particularly if this vendor serves a significant share of the EU financial sector. Monitor the ESA CTPP list for any future designation of this provider. If designated as CTPP after contract signing, additional DORA Art. 31+ requirements will apply.',
@@ -1218,7 +1221,8 @@ const results = {
       { text: 'TLPT cooperation clause included', tag: 'legal' },
       { text: 'Vendor BCP reviewed and adequate for institution\'s RTO/RPO', tag: 'risk' },
       { text: 'Management sign-off from Outsourcing Officer', tag: 'mgmt' },
-      { text: 'Register of Information entry prepared', tag: 'ops' }
+      { text: 'Register of Information entry prepared', tag: 'ops' },
+      { text: 'Substitutability assessment documented', tag: 'risk' }
     ]
   },
 
@@ -1270,7 +1274,8 @@ const results = {
       'Register must show the sub-outsourcing chain',
       'External vendor is subject to the same requirements as a direct vendor',
       'Concentration risk assessment for the entire chain',
-      'Exit strategy must cover scenarios where the external vendor fails'
+      'Exit strategy must cover scenarios where the external vendor fails',
+      'Assess substitutability — document whether this service can be replaced within a reasonable timeframe if the provider fails or terminates. DORA Art. 28(2).'
     ],
     examples: ['Group IT company using AWS', 'Intra-group payment entity using SWIFT'],
     ctpp: 'The external sub-vendor may be a hyperscaler or potential CTPP. <strong>Assess concentration risk across the full chain</strong> — institution → intra-group entity → external vendor. If the sub-vendor is AWS/Azure/GCP, CTPP monitoring obligations apply at the end of the chain.',
@@ -1284,7 +1289,8 @@ const results = {
       { text: 'Register of Information shows the full chain', tag: 'ops' },
       { text: 'Concentration risk assessed across the entire chain', tag: 'risk' },
       { text: 'Exit plan covers scenario where external vendor fails', tag: 'ops' },
-      { text: 'Management sign-off for both intra-group arrangement and sub-vendor', tag: 'mgmt' }
+      { text: 'Management sign-off for both intra-group arrangement and sub-vendor', tag: 'mgmt' },
+      { text: 'Substitutability assessment documented', tag: 'risk' }
     ]
   },
 
@@ -1305,7 +1311,9 @@ const results = {
       'Due diligence before contracting',
       'Exit plan required under MaRisk AT 9',
       'Sub-outsourcing controls',
-      'Sub-outsourcing must be contractually controlled — vendor must notify the institution and obtain prior approval before engaging any sub-contractors'
+      'Sub-outsourcing must be contractually controlled — vendor must notify the institution and obtain prior approval before engaging any sub-contractors',
+      'Assess substitutability — document whether this service can be replaced within a reasonable timeframe if the provider fails or terminates. DORA Art. 28(2).',
+      'Check CTPP register — verify whether this provider has been designated a Critical Third-Party Provider by ESA supervisory authorities. Enhanced oversight obligations apply if designated.'
     ],
     examples: ['Internal IT helpdesk service', 'Non-critical reporting tool', 'Internal communications platforms'],
     bafin: '<strong>Notification required.</strong> Material outsourcing (wesentliche Auslagerung) must be notified to BaFin regardless of CIF status (§ 25b KWG / MaRisk AT 9.2). Notify before go-live.',
@@ -1320,7 +1328,9 @@ const results = {
       { text: 'Outsourcing Officer sign-off obtained', tag: 'mgmt' },
       { text: 'Exit plan documented and approved', tag: 'ops' },
       { text: 'BaFin go-live notification prepared', tag: 'mgmt' },
-      { text: 'Sub-outsourcing clause included in contract — vendor approval required before any sub-contractor engagement', tag: 'legal' }
+      { text: 'Sub-outsourcing clause included in contract — vendor approval required before any sub-contractor engagement', tag: 'legal' },
+      { text: 'Substitutability assessment documented', tag: 'risk' },
+      { text: 'Provider CTPP status verified', tag: 'risk' }
     ]
   },
 
@@ -1342,7 +1352,9 @@ const results = {
       'Recommended periodic review of access rights',
       'Exit plan required under MaRisk AT 9',
       'Annual management report required',
-      'Sub-outsourcing must be contractually controlled — vendor must notify the institution and obtain prior approval before engaging any sub-contractors'
+      'Sub-outsourcing must be contractually controlled — vendor must notify the institution and obtain prior approval before engaging any sub-contractors',
+      'Assess substitutability — document whether this service can be replaced within a reasonable timeframe if the provider fails or terminates. DORA Art. 28(2).',
+      'Check CTPP register — verify whether this provider has been designated a Critical Third-Party Provider by ESA supervisory authorities. Enhanced oversight obligations apply if designated.'
     ],
     examples: ['CRM with customer data', 'Analytics platform with data access', 'External fraud detection with transaction data'],
     bafin: '<strong>Notification required.</strong> Material outsourcing with customer data access must be notified to BaFin before go-live (§ 25b KWG). The data processing scope should be described in the notification.',
@@ -1360,7 +1372,9 @@ const results = {
       { text: 'Exit plan documented and approved', tag: 'ops' },
       { text: 'Annual management report process set up', tag: 'mgmt' },
       { text: 'BaFin go-live notification prepared', tag: 'mgmt' },
-      { text: 'Sub-outsourcing clause included in contract — vendor approval required before any sub-contractor engagement', tag: 'legal' }
+      { text: 'Sub-outsourcing clause included in contract — vendor approval required before any sub-contractor engagement', tag: 'legal' },
+      { text: 'Substitutability assessment documented', tag: 'risk' },
+      { text: 'Provider CTPP status verified', tag: 'risk' }
     ]
   },
 
@@ -1376,7 +1390,10 @@ const results = {
       'Included in the Register of Information (DORA requirement)',
       'Standard vendor management process',
       'Periodic re-evaluation of classification',
-      'Incident notification clause recommended'
+      'Incident notification clause recommended',
+      'Assess substitutability — document whether this service can be replaced within a reasonable timeframe if the provider fails or terminates. DORA Art. 28(2).',
+      'Assess concentration risk at portfolio level — consider whether over-reliance on this provider or provider group creates systemic risk. DORA Art. 28(4).',
+      'Note CTPP status in Register of Information if provider is designated.'
     ],
     examples: ['Low-risk SaaS tools', 'Internal analytics platforms', 'Non-critical development tools'],
     bafin: '<strong>No BaFin notification required</strong> for non-material outsourcing. However, the arrangement must be documented in your internal outsourcing register and included in the DORA Register of Information. If classification changes to material in future, notification obligation arises immediately.',
@@ -1386,7 +1403,9 @@ const results = {
       { text: 'Incident notification clause included (recommended)', tag: 'legal' },
       { text: 'Register of Information entry prepared — mandatory for all ICT services', tag: 'ops' },
       { text: 'Periodic re-evaluation date set (recommend annual)', tag: 'ops' },
-      { text: 'Standard vendor management process initiated', tag: 'ops' }
+      { text: 'Standard vendor management process initiated', tag: 'ops' },
+      { text: 'Substitutability assessment documented', tag: 'risk' },
+      { text: 'Concentration risk assessed at portfolio level', tag: 'risk' }
     ]
   },
 
@@ -1401,7 +1420,10 @@ const results = {
       'Standard contract with minimal Art. 30(2) clauses',
       'Included in the Register of Information if there is an ICT element',
       'Regular vendor management review',
-      'Classification must be re-evaluated if the scope expands'
+      'Classification must be re-evaluated if the scope expands',
+      'Assess substitutability — document whether this service can be replaced within a reasonable timeframe if the provider fails or terminates. DORA Art. 28(2).',
+      'Assess concentration risk at portfolio level — consider whether over-reliance on this provider or provider group creates systemic risk. DORA Art. 28(4).',
+      'Note CTPP status in Register of Information if provider is designated.'
     ],
     examples: ['Small SaaS without system access', 'Specialised tools for internal processes'],
     bafin: '<strong>No BaFin notification required.</strong> Non-material outsourcing without system access is below the notification threshold. Document in internal register. Re-evaluate if scope expands.',
@@ -1410,7 +1432,9 @@ const results = {
       { text: 'Standard contract with minimal Art. 30(2) clauses confirmed', tag: 'legal' },
       { text: 'Check if any ICT element exists — if yes, register entry required', tag: 'ops' },
       { text: 'Re-evaluation trigger set if scope expands (data access, system integration)', tag: 'ops' },
-      { text: 'Standard vendor management process initiated', tag: 'ops' }
+      { text: 'Standard vendor management process initiated', tag: 'ops' },
+      { text: 'Substitutability assessment documented', tag: 'risk' },
+      { text: 'Concentration risk assessed at portfolio level', tag: 'risk' }
     ]
   },
 
@@ -1429,7 +1453,10 @@ const results = {
       'Data access scope must be documented and limited to minimum necessary',
       'Included in the Register of Information (DORA requirement)',
       'Incident notification clause recommended for data breach scenarios',
-      'Classification must be re-evaluated if the scope or data access expands'
+      'Classification must be re-evaluated if the scope or data access expands',
+      'Assess substitutability — document whether this service can be replaced within a reasonable timeframe if the provider fails or terminates. DORA Art. 28(2).',
+      'Assess concentration risk at portfolio level — consider whether over-reliance on this provider or provider group creates systemic risk. DORA Art. 28(4).',
+      'Note CTPP status in Register of Information if provider is designated.'
     ],
     examples: ['Analytics tool with read access to transaction data', 'External HR platform with employee data', 'Non-critical reporting tool with customer data export'],
     bafin: '<strong>No BaFin notification required.</strong> Non-material outsourcing is below the notification threshold. However, GDPR obligations apply where personal data is processed and a DORA Register of Information entry is required. Re-evaluate if scope expands.',
@@ -1442,7 +1469,9 @@ const results = {
       { text: 'Incident notification clause included (recommended for data breach scenarios)', tag: 'legal' },
       { text: 'Register of Information entry prepared — mandatory for ICT services', tag: 'ops' },
       { text: 'Re-evaluation trigger set if scope or data access expands', tag: 'ops' },
-      { text: 'Standard vendor management process initiated', tag: 'ops' }
+      { text: 'Standard vendor management process initiated', tag: 'ops' },
+      { text: 'Substitutability assessment documented', tag: 'risk' },
+      { text: 'Concentration risk assessed at portfolio level', tag: 'risk' }
     ]
   },
 
@@ -1512,7 +1541,9 @@ const results = {
       'Audit rights — required by DORA',
       'Exit strategy must be considered',
       'Incident notification clause is mandatory',
-      'No MaRisk annual management report, but DORA governance requirements apply'
+      'No MaRisk annual management report, but DORA governance requirements apply',
+      'Assess substitutability — document whether this service can be replaced within a reasonable timeframe if the provider fails or terminates. DORA Art. 28(2).',
+      'Assess concentration risk at portfolio level — consider whether over-reliance on this provider or provider group creates systemic risk. DORA Art. 28(4).'
     ],
     examples: ['Microsoft 365 for regulatory communication', 'Telecom infrastructure critical for systems', 'EDR/antivirus on critical servers'],
     ctpp: 'If this provider is a major hyperscaler (Microsoft, AWS, etc.), <strong>CTPP monitoring applies</strong> even though this is not MaRisk outsourcing. Assess concentration risk. DORA Art. 31+ oversight obligations apply if the provider is formally designated as CTPP by the ESAs.',
@@ -1524,7 +1555,9 @@ const results = {
       { text: 'Audit rights clause negotiated — may be difficult with large vendors', tag: 'legal' },
       { text: 'Exit strategy considered and documented', tag: 'ops' },
       { text: 'Incident notification clause included in contract', tag: 'legal' },
-      { text: 'No MaRisk annual report needed, but DORA governance file maintained', tag: 'mgmt' }
+      { text: 'No MaRisk annual report needed, but DORA governance file maintained', tag: 'mgmt' },
+      { text: 'Substitutability assessment documented', tag: 'risk' },
+      { text: 'Concentration risk assessed at portfolio level', tag: 'risk' }
     ]
   },
 
@@ -1539,7 +1572,9 @@ const results = {
       'Included in the Register of Information (DORA)',
       'Art. 30(2) clauses — minimum DORA requirement',
       'Standard vendor management',
-      'Periodic re-classification recommended'
+      'Periodic re-classification recommended',
+      'Assess substitutability — document whether this service can be replaced within a reasonable timeframe if the provider fails or terminates. DORA Art. 28(2).',
+      'Assess concentration risk at portfolio level — consider whether over-reliance on this provider or provider group creates systemic risk. DORA Art. 28(4).'
     ],
     examples: ['Standard software licences', 'Public cloud storage for non-critical content', 'Communication tools without critical usage'],
     bafin: '<strong>No BaFin notification required.</strong> Not MaRisk outsourcing — below notification threshold. DORA Register of Information entry still required. Monitor for scope changes.',
@@ -1548,7 +1583,9 @@ const results = {
       { text: 'Register of Information entry prepared — required by DORA', tag: 'ops' },
       { text: 'Art. 30(2) minimum clauses confirmed in contract', tag: 'legal' },
       { text: 'Periodic re-classification reminder set', tag: 'ops' },
-      { text: 'Standard vendor management process initiated', tag: 'ops' }
+      { text: 'Standard vendor management process initiated', tag: 'ops' },
+      { text: 'Substitutability assessment documented', tag: 'risk' },
+      { text: 'Concentration risk assessed at portfolio level', tag: 'risk' }
     ]
   },
 
