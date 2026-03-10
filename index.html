@@ -867,7 +867,7 @@ const nodes = {
     question: 'Does this cloud service support a critical or important function of the institution (CIF)?',
     hint: 'YES: core banking, payment processing, AML/KYC, fraud detection, risk management, regulatory reporting, trading platforms, customer-facing digital channels, identity and authentication systems, credit decisioning.<br>NO: internal HR tools, payroll, non-critical analytics, internal communication platforms, facility management systems.',
     answers: [
-      { label: 'YES — supports a CIF', type: 'yes', next: 'q3b_cloud_ctpp' },
+      { label: 'YES — supports a CIF', type: 'yes', next: 'q3b_cloud_ctpp', action: 'setCIF' },
       { label: 'NO — does not support a CIF', type: 'no', next: 'q_cloud_noncif_material' }
     ]
   },
@@ -877,7 +877,7 @@ const nodes = {
     question: 'Is the provider within the same group (intra-group)?',
     hint: '<strong>Intra-group:</strong> provider belongs to the same group/holding. Full MaRisk/DORA requirements still apply — contract, SLA, audit rights, exit plan required.',
     answers: [
-      { label: 'YES — intra-group cloud provider', type: 'yes', next: 'q3d_cloud_intra_sub' },
+      { label: 'YES — intra-group cloud provider', type: 'yes', next: 'q3d_cloud_intra_sub', action: 'setIntragroup' },
       { label: 'NO — external cloud provider', type: 'no', next: 'q3e_cloud_ctpp_check' }
     ]
   },
@@ -887,8 +887,8 @@ const nodes = {
     question: 'Does the intra-group cloud provider use external sub-vendors for the critical function?',
     hint: 'YES: group IT entity running on AWS/Azure.<br>NO: all infrastructure owned and operated within the group.',
     answers: [
-      { label: 'YES — sub-outsourcing to external cloud/vendor', type: 'yes', next: 'result_intragroup_sub' },
-      { label: 'NO — pure intra-group cloud', type: 'no', next: 'result_intragroup_ict_cif' }
+      { label: 'YES — sub-outsourcing to external cloud/vendor', type: 'yes', next: 'result_ig2', action: 'setSubOutsourcing' },
+      { label: 'NO — pure intra-group cloud', type: 'no', next: 'result_ig2' }
     ]
   },
 
@@ -897,8 +897,8 @@ const nodes = {
     question: 'Is this a major hyperscaler or potential CTPP (Critical Third-Party Provider)?',
     hint: 'YES: AWS, Microsoft Azure, Google Cloud, Oracle Cloud, IBM Cloud, Salesforce.<br>NO: specialised regional or sector-specific cloud vendors.',
     answers: [
-      { label: 'YES / POSSIBLY — major cloud or mega provider', type: 'yes', next: 'result_outsourcing_ict_material_cif', action: 'setCTPP' },
-      { label: 'NO — specialised cloud vendor', type: 'no', next: 'result_outsourcing_ict_material_cif' }
+      { label: 'YES / POSSIBLY — major cloud or mega provider', type: 'yes', next: 'result_class4', action: 'setCTPP' },
+      { label: 'NO — specialised cloud vendor', type: 'no', next: 'result_class4' }
     ]
   },
 
@@ -917,8 +917,8 @@ const nodes = {
     question: 'Does the service have access to customer data, employee data, or the institution\'s production systems?',
     hint: 'YES: vendor portal with customer data, SaaS tool processing employee records, read access to production systems. NO: standalone tool, no data access, no system integration.',
     answers: [
-      { label: 'YES — data or system access exists', type: 'yes', next: 'result_non_material_ict' },
-      { label: 'NO — no data access or system integration', type: 'no', next: 'result_non_material_ict' }
+      { label: 'YES — data or system access exists', type: 'yes', next: 'result_class3' },
+      { label: 'NO — no data access or system integration', type: 'no', next: 'result_class3' }
     ]
   },
 
@@ -927,8 +927,8 @@ const nodes = {
     question: 'Does the cloud service have access to customer data or production systems?',
     hint: 'YES: customer records, transaction data, production databases.<br>NO: anonymised analytics, internal test data.',
     answers: [
-      { label: 'YES — access to customer/production data', type: 'yes', next: 'result_material_non_cif' },
-      { label: 'NO — internal/non-sensitive data only', type: 'no', next: 'result_material_non_cif' }
+      { label: 'YES — access to customer/production data', type: 'yes', next: 'result_class5' },
+      { label: 'NO — internal/non-sensitive data only', type: 'no', next: 'result_class5' }
     ]
   },
 
@@ -947,7 +947,7 @@ const nodes = {
     question: 'Does the service support a critical or important function of the institution (CIF)?',
     hint: 'YES: core banking, payment processing, AML/KYC, fraud detection, risk management, regulatory reporting, trading platforms, customer-facing digital channels, identity and authentication systems, credit decisioning.<br>NO: internal HR tools, payroll, non-critical analytics, internal communication platforms, facility management systems.',
     answers: [
-      { label: 'YES — supports a CIF', type: 'yes', next: 'q5_intragroup' },
+      { label: 'YES — supports a CIF', type: 'yes', next: 'q5_intragroup', action: 'setCIF' },
       { label: 'NO — does not support a CIF', type: 'no', next: 'q_ict_only_material' }
     ]
   },
@@ -957,7 +957,7 @@ const nodes = {
     question: 'Is the provider within the same group (intra-group)?',
     hint: '<strong>Intra-group:</strong> provider belongs to the same group/holding. Full MaRisk/DORA requirements still apply — contract, SLA, audit rights, exit plan required.',
     answers: [
-      { label: 'YES — intra-group provider', type: 'yes', next: 'q6_ctpp_intra' },
+      { label: 'YES — intra-group provider', type: 'yes', next: 'q6_ctpp_intra', action: 'setIntragroup' },
       { label: 'NO — external provider', type: 'no', next: 'q_non_eu_provider' }
     ]
   },
@@ -977,8 +977,8 @@ const nodes = {
     question: 'Is the provider a potential CTPP (Critical Third-Party Provider)?',
     hint: 'YES: AWS, Microsoft Azure, Google Cloud, Oracle Cloud, IBM, Accenture.<br>NO: specialised providers not serving a systemic share of EU financial institutions.',
     answers: [
-      { label: 'YES / POSSIBLY — major cloud or mega provider', type: 'yes', next: 'result_outsourcing_ict_material_cif', action: 'setCTPP' },
-      { label: 'NO — standard external vendor', type: 'no', next: 'result_outsourcing_ict_material_cif' }
+      { label: 'YES / POSSIBLY — major cloud or mega provider', type: 'yes', next: 'result_class4', action: 'setCTPP' },
+      { label: 'NO — standard external vendor', type: 'no', next: 'result_class4' }
     ]
   },
 
@@ -987,8 +987,8 @@ const nodes = {
     question: 'Does the intra-group provider use external sub-vendors for the critical function?',
     hint: 'YES: intra-group entity subcontracts to an external vendor.<br>NO: all delivery stays within the group with no external dependencies.',
     answers: [
-      { label: 'YES — sub-outsourcing to an external vendor exists', type: 'yes', next: 'result_intragroup_sub' },
-      { label: 'NO — everything stays within the group', type: 'no', next: 'result_intragroup_ict_cif' }
+      { label: 'YES — sub-outsourcing to an external vendor exists', type: 'yes', next: 'result_ig2', action: 'setSubOutsourcing' },
+      { label: 'NO — everything stays within the group', type: 'no', next: 'result_ig2' }
     ]
   },
 
@@ -998,7 +998,7 @@ const nodes = {
     hint: 'YES: core banking, risk systems, payment processing — institution would do this itself.<br>NO: commodity software licence, infrastructure service, network provider — institution would not do this itself.',
     answers: [
       { label: 'YES — institution would do this itself', type: 'yes', next: 'q_ict_intragroup_noncif' },
-      { label: 'NO — pure ICT service only', type: 'no', next: 'result_ict_material_noncif' }
+      { label: 'NO — pure ICT service only', type: 'no', next: 'result_class3' }
     ]
   },
 
@@ -1007,8 +1007,8 @@ const nodes = {
     question: 'Is the ICT provider within the same group (intra-group)?',
     hint: 'YES: provider belongs to the same group/holding.<br>NO: external provider.',
     answers: [
-      { label: 'YES — intra-group provider', type: 'yes', next: 'result_intragroup_ict_noncif' },
-      { label: 'NO — external provider', type: 'no', next: 'result_material_non_cif' }
+      { label: 'YES — intra-group provider', type: 'yes', next: 'result_ig3', action: 'setIntragroup' },
+      { label: 'NO — external provider', type: 'no', next: 'result_class5' }
     ]
   },
 
@@ -1057,7 +1057,7 @@ const nodes = {
     question: 'Does the service support a critical or important function of the institution?',
     hint: 'YES: core banking, payment processing, AML/KYC, fraud detection, risk management, regulatory reporting, trading platforms, customer-facing digital channels, identity and authentication systems, credit decisioning.<br>NO: internal HR tools, payroll, non-critical analytics, internal communication platforms, facility management systems.',
     answers: [
-      { label: 'YES — supports a critical or important function', type: 'yes', next: 'q_non_ict_cif_intragroup' },
+      { label: 'YES — supports a critical or important function', type: 'yes', next: 'q_non_ict_cif_intragroup', action: 'setCIF' },
       { label: 'NO — does not support a CIF', type: 'no', next: 'q_non_ict_material_non_cif_intragroup' }
     ]
   },
@@ -1067,8 +1067,8 @@ const nodes = {
     question: 'Is the provider within the same group (intra-group)?',
     hint: '<strong>Intra-group:</strong> provider belongs to the same group/holding. Full MaRisk AT 9 and EBA GL obligations still apply.',
     answers: [
-      { label: 'YES — intra-group provider', type: 'yes', next: 'q_non_ict_intragroup_sub' },
-      { label: 'NO — external provider', type: 'no', next: 'result_material_non_ict_cif' }
+      { label: 'YES — intra-group provider', type: 'yes', next: 'q_non_ict_intragroup_sub', action: 'setIntragroup' },
+      { label: 'NO — external provider', type: 'no', next: 'result_class1' }
     ]
   },
 
@@ -1077,8 +1077,8 @@ const nodes = {
     question: 'Does the intra-group provider use external sub-vendors for this function?',
     hint: 'YES: intra-group entity sub-contracts to an external firm.<br>NO: all delivery remains within the group.',
     answers: [
-      { label: 'YES — sub-outsourcing to an external vendor exists', type: 'yes', next: 'result_intragroup_non_ict_sub' },
-      { label: 'NO — everything stays within the group', type: 'no', next: 'result_intragroup_non_ict' }
+      { label: 'YES — sub-outsourcing to an external vendor exists', type: 'yes', next: 'result_ig1', action: 'setSubOutsourcing' },
+      { label: 'NO — everything stays within the group', type: 'no', next: 'result_ig1' }
     ]
   },
 
@@ -1087,8 +1087,8 @@ const nodes = {
     question: 'Is the provider within the same group (intra-group)?',
     hint: '<strong>Intra-group:</strong> provider belongs to the same group/holding. MaRisk AT 9 obligations still apply.',
     answers: [
-      { label: 'YES — intra-group provider', type: 'yes', next: 'q_non_ict_non_cif_intragroup_sub' },
-      { label: 'NO — external provider', type: 'no', next: 'result_material_non_ict_non_cif' }
+      { label: 'YES — intra-group provider', type: 'yes', next: 'q_non_ict_non_cif_intragroup_sub', action: 'setIntragroup' },
+      { label: 'NO — external provider', type: 'no', next: 'result_class1' }
     ]
   },
 
@@ -1097,8 +1097,8 @@ const nodes = {
     question: 'Does the intra-group provider use external sub-vendors for this function?',
     hint: 'YES: intra-group entity sub-contracts to an external firm.<br>NO: all delivery remains within the group.',
     answers: [
-      { label: 'YES — sub-outsourcing to an external vendor exists', type: 'yes', next: 'result_material_non_ict_non_cif_intragroup_sub' },
-      { label: 'NO — everything stays within the group', type: 'no', next: 'result_material_non_ict_non_cif_intragroup' }
+      { label: 'YES — sub-outsourcing to an external vendor exists', type: 'yes', next: 'result_ig1', action: 'setSubOutsourcing' },
+      { label: 'NO — everything stays within the group', type: 'no', next: 'result_ig1' }
     ]
   },
 
@@ -1107,8 +1107,8 @@ const nodes = {
     question: 'Is the provider within the same group (intra-group)?',
     hint: '<strong>Intra-group:</strong> provider belongs to the same group/holding. Document and periodically review even for non-material arrangements.',
     answers: [
-      { label: 'YES — intra-group provider', type: 'yes', next: 'result_non_material_non_ict_intragroup' },
-      { label: 'NO — external provider', type: 'no', next: 'result_non_material_non_ict' }
+      { label: 'YES — intra-group provider', type: 'yes', next: 'result_class2', action: 'setIntragroup' },
+      { label: 'NO — external provider', type: 'no', next: 'result_class2' }
     ]
   },
 
@@ -1117,18 +1117,85 @@ const nodes = {
     question: "Does the ICT service still have access to the institution's systems or data?",
     hint: 'YES: vendor has read/write access to institution systems or data.<br>NO: standalone service with no integration to institution infrastructure.',
     answers: [
-      { label: 'YES — has access to systems/data', type: 'yes', next: 'result_non_material_ict' },
-      { label: 'NO — no access', type: 'no', next: 'result_non_material_ict' }
+      { label: 'YES — has access to systems/data', type: 'yes', next: 'result_class6' },
+      { label: 'NO — no access', type: 'no', next: 'result_class6' }
     ]
   },
 
 };
 
 const results = {
-  'result_ict_material_noncif': {
+  // ── CLASS 1 — MATERIAL OUTSOURCING, External (non-ICT) ──
+  'result_class1': {
+    bafin_required: true,
+    title: 'MATERIAL OUTSOURCING — External',
+    alert: { type: 'warning', text: 'Full MaRisk AT 9 and EBA GL requirements apply. DORA ICT-specific requirements do not apply to this arrangement. Institution-level DORA obligations (Art. 6, Art. 28) apply regardless.' },
+    classifications: [
+      { type: 'marisk', label: 'MaRisk AT 9', value: 'Material outsourcing — full requirements' },
+      { type: 'dora', label: 'DORA', value: 'DORA Art. 30 N/A — verify no ICT components exist' },
+      { type: 'eba', label: 'EBA GL', value: '_dynamic_' }
+    ],
+    implications: [
+      'Full MaRisk AT 9 contract requirements apply',
+      'Unrestricted audit rights must be agreed in the contract',
+      'Documented exit strategy required — tested and maintained',
+      'Annual management report on this arrangement',
+      'Concentration risk assessment required',
+      'No DORA Register of Information entry required unless an ICT component exists',
+      'Sub-outsourcing must be contractually controlled — vendor must notify the institution and obtain prior approval before engaging any sub-contractors'
+    ],
+    examples: ['Outsourced compliance function', 'External internal audit', 'Outsourced credit analysis', 'Outsourced back-office operations', 'Administrative support functions'],
+    bafin: '<strong>Notification required.</strong> Material outsourcing is subject to BaFin notification under § 25b KWG / MaRisk AT 9.2. Two notifications required: intention to outsource (before contract signing) and go-live notification.',
+    timeline: 'Expect 6–10 weeks. Full MaRisk process applies. BaFin notification required before go-live.',
+    checklist: [
+      { text: 'Contract review and approval', tag: 'legal' },
+      { text: 'Risk assessment completed and documented', tag: 'risk' },
+      { text: 'Full MaRisk AT 9 compliant contract drafted', tag: 'legal' },
+      { text: 'Audit rights agreed in contract', tag: 'legal' },
+      { text: 'Sub-contractors reviewed and approved', tag: 'risk' },
+      { text: 'Concentration risk assessed', tag: 'risk' },
+      { text: 'Exit plan documented and approved', tag: 'risk' },
+      { text: 'Annual management report process set up', tag: 'risk' },
+      { text: 'EBA GL CIF requirements confirmed (non-ICT path)', tag: 'legal' },
+      { text: 'Outsourcing Officer sign-off obtained', tag: 'risk' },
+      { text: 'BaFin intention notification prepared', tag: 'risk' },
+      { text: 'BaFin go-live notification prepared', tag: 'risk' },
+      { text: 'Sub-outsourcing clause included in contract — vendor approval required before any sub-contractor engagement', tag: 'legal' }
+    ]
+  },
+
+  // ── CLASS 2 — NON-MATERIAL OUTSOURCING, non-Critical Function ──
+  'result_class2': {
     bafin_required: false,
-    title: 'ICT SERVICE — Material, non-Critical Function',
-    alert: { type: 'warning', text: 'This is a material ICT service that is not outsourcing under MaRisk AT 9. DORA requirements apply. No BaFin notification required.' },
+    title: 'NON-MATERIAL OUTSOURCING — non-Critical Function',
+    alert: { type: 'warning', text: 'Standard MaRisk requirements apply. No BaFin notification required. Periodic classification review required.' },
+    classifications: [
+      { type: 'marisk', label: 'MaRisk AT 9', value: 'Non-material outsourcing — standard requirements' },
+      { type: 'dora', label: 'DORA', value: 'Institution-level only' },
+      { type: 'eba', label: 'EBA GL', value: 'Standard due diligence' }
+    ],
+    implications: [
+      'Standard MaRisk outsourcing contract required',
+      'EBA GL standard due diligence required',
+      'Sub-outsourcing must be contractually controlled',
+      'Periodic classification review required — if materiality changes, re-classify immediately',
+      'Institution-level DORA obligations apply regardless'
+    ],
+    examples: ['Minor outsourced processes', 'Non-critical administrative services', 'Specialised non-critical services', 'Minor intra-group services'],
+    bafin: 'No BaFin notification required. Non-material outsourcing is below the notification threshold under § 25b KWG. Document in internal outsourcing register. If classification changes to material, notification obligation arises immediately.',
+    checklist: [
+      { text: 'Contract review and approval', tag: 'legal' },
+      { text: 'Risk assessment completed and documented', tag: 'risk' },
+      { text: 'Sub-contractors reviewed and approved', tag: 'risk' },
+      { text: 'Periodic classification review scheduled', tag: 'risk' }
+    ]
+  },
+
+  // ── CLASS 3 — ICT SERVICE, External (pure ICT, not outsourcing) ──
+  'result_class3': {
+    bafin_required: false,
+    title: 'ICT SERVICE — External (not outsourcing)',
+    alert: { type: 'warning', text: 'This is an ICT service that is not outsourcing under MaRisk AT 9. DORA requirements apply. No BaFin notification required.' },
     classifications: [
       { type: 'marisk', label: 'MaRisk AT 9', value: 'N/A — not outsourcing' },
       { type: 'dora', label: 'DORA', value: 'Art. 28(3), Art. 30(2), Art. 28(2), Art. 28(4)' },
@@ -1142,7 +1209,7 @@ const results = {
       'Sub-outsourcing must be contractually controlled',
       'Periodic classification review required — if arrangement grows into outsourcing, re-classify immediately'
     ],
-    examples: ['Standalone ICT tool', 'Infrastructure service without outsourcing component', 'Network service provider'],
+    examples: ['Standalone ICT tool', 'Infrastructure service without outsourcing component', 'Network service provider', 'Low-risk SaaS tools', 'Non-critical analytics platforms'],
     bafin: 'No BaFin notification required. This arrangement is not outsourcing under MaRisk AT 9 / § 25b KWG. DORA Register of Information entry is required. If the arrangement is later classified as outsourcing, notification obligation arises immediately.',
     checklist: [
       { text: 'Contract review and approval', tag: 'legal' },
@@ -1154,76 +1221,8 @@ const results = {
     ]
   },
 
-  'result_intragroup_ict_cif': {
-    bafin_required: true,
-    title: 'INTRA-GROUP — MATERIAL OUTSOURCING, ICT, Critical Function',
-    alert: { type: 'warning', text: 'Intra-group status does not exempt this arrangement from DORA requirements. DORA Art. 28(8) exit strategy is required regardless of MaRisk intra-group exemption.' },
-    classifications: [
-      { type: 'marisk', label: 'MaRisk AT 9', value: 'Material outsourcing intra-group — simplified due diligence permitted' },
-      { type: 'dora', label: 'DORA', value: 'Art. 28(3), Art. 30(2), Art. 30(3), Art. 28(2), Art. 28(4), Art. 28(8)' },
-      { type: 'eba', label: 'EBA GL', value: 'Critical function intra-group — simplified due diligence permitted' }
-    ],
-    implications: [
-      'Full MaRisk AT 9 requirements apply — simplified due diligence permitted',
-      'Intra-group SLA required in writing',
-      'DORA Art. 30(2) and Art. 30(3) enhanced clauses apply',
-      'Register of Information entry required — Art. 28(3)',
-      'Exit strategy required under DORA Art. 28(8) — MaRisk intra-group exemption does not override DORA',
-      'Sub-outsourcing must be contractually controlled',
-      'Concentration risk assessment required',
-      'Annual management report required'
-    ],
-    examples: ['Group IT shared services supporting critical function', 'Intra-group payment hub', 'Group core banking platform'],
-    bafin: 'Notification required. Intra-group status does not exempt material outsourcing from BaFin notification under § 25b KWG / MaRisk AT 9.2. Two notifications required — intention before contract signing and go-live when operational.',
-    checklist: [
-      { text: 'Contract review and approval', tag: 'legal' },
-      { text: 'Risk assessment completed and documented', tag: 'risk' },
-      { text: 'Sub-contractors reviewed and approved', tag: 'risk' },
-      { text: 'Concentration risk assessed', tag: 'risk' },
-      { text: 'Exit strategy documented — DORA Art. 28(8)', tag: 'risk' },
-      { text: 'Register of Information entry prepared', tag: 'ops' },
-      { text: 'Annual management report process set up', tag: 'risk' },
-      { text: 'Outsourcing Officer sign-off obtained', tag: 'risk' },
-      { text: 'BaFin intention notification prepared', tag: 'risk' },
-      { text: 'BaFin go-live notification prepared', tag: 'risk' }
-    ]
-  },
-
-  'result_intragroup_ict_noncif': {
-    bafin_required: true,
-    title: 'INTRA-GROUP — MATERIAL OUTSOURCING, ICT, non-Critical Function',
-    alert: { type: 'warning', text: 'Intra-group status does not exempt this arrangement from DORA requirements. MaRisk intra-group exemption applies — no exit plan required.' },
-    classifications: [
-      { type: 'marisk', label: 'MaRisk AT 9', value: 'Material outsourcing intra-group — simplified due diligence permitted' },
-      { type: 'dora', label: 'DORA', value: 'Art. 28(3), Art. 30(2), Art. 28(2), Art. 28(4)' },
-      { type: 'eba', label: 'EBA GL', value: 'Standard due diligence — simplified permitted for intra-group' }
-    ],
-    implications: [
-      'Full MaRisk AT 9 requirements apply — simplified due diligence permitted',
-      'Intra-group SLA required in writing',
-      'DORA Art. 30(2) minimum clauses apply',
-      'Register of Information entry required — Art. 28(3)',
-      'No exit plan required — MaRisk intra-group exemption applies. DORA Art. 28(8) does not apply — non-CIF.',
-      'Sub-outsourcing must be contractually controlled',
-      'Concentration risk assessment required',
-      'Annual management report required'
-    ],
-    examples: ['Group IT shared services non-critical', 'Intra-group infrastructure non-CIF', 'Group technology platform non-critical'],
-    bafin: 'Notification required. Intra-group status does not exempt material outsourcing from BaFin notification under § 25b KWG / MaRisk AT 9.2. Two notifications required — intention before contract signing and go-live when operational.',
-    checklist: [
-      { text: 'Contract review and approval', tag: 'legal' },
-      { text: 'Risk assessment completed and documented', tag: 'risk' },
-      { text: 'Sub-contractors reviewed and approved', tag: 'risk' },
-      { text: 'Concentration risk assessed', tag: 'risk' },
-      { text: 'Register of Information entry prepared', tag: 'ops' },
-      { text: 'Annual management report process set up', tag: 'risk' },
-      { text: 'Outsourcing Officer sign-off obtained', tag: 'risk' },
-      { text: 'BaFin intention notification prepared', tag: 'risk' },
-      { text: 'BaFin go-live notification prepared', tag: 'risk' }
-    ]
-  },
-
-  'result_outsourcing_ict_material_cif': {
+  // ── CLASS 4 — MATERIAL OUTSOURCING, ICT, Critical Function ──
+  'result_class4': {
     bafin_required: true,
     title: 'MATERIAL OUTSOURCING — ICT, Critical Function',
     alert: { type: 'warning', text: 'Full MaRisk AT 9, EBA GL CIF, and DORA requirements apply. Highest regulatory burden.' },
@@ -1258,42 +1257,8 @@ const results = {
     ]
   },
 
-  'result_intragroup_sub': {
-    bafin_required: true,
-    title: 'INTRA-GROUP WITH SUB-OUTSOURCING — ICT, Critical Function',
-    alert: { type: 'critical', text: 'Sub-outsourcing to an external vendor — you remain responsible for the entire chain. DORA requirements apply in full.' },
-    classifications: [
-      { type: 'marisk', label: 'MaRisk AT 9', value: 'Material outsourcing with sub-outsourcing' },
-      { type: 'dora', label: 'DORA', value: 'Art. 28(3), Art. 30(2), Art. 30(3), Art. 28(2), Art. 28(4), Art. 28(8)' },
-      { type: 'eba', label: 'EBA GL', value: 'Critical function with sub-contractor requirements' }
-    ],
-    implications: [
-      'Full sub-outsourcing chain must be mapped and documented',
-      'External sub-vendor must be formally approved before engagement',
-      'Sub-outsourcing clause required in intra-group contract',
-      'Equivalent contractual requirements must flow down to external sub-vendor',
-      'Exit strategy required under DORA Art. 28(8) — must cover failure of external sub-vendor',
-      'Register of Information must show full sub-outsourcing chain',
-      'Concentration risk assessment across full chain required',
-      'Annual management report must cover full sub-outsourcing chain'
-    ],
-    examples: ['Group IT company running on AWS', 'Intra-group payment entity using external processor'],
-    bafin: 'Notification required. Sub-outsourcing chain must be disclosed as part of BaFin notification under § 25b KWG / MaRisk AT 9.2. Two notifications required — intention before contract signing and go-live when operational.',
-    checklist: [
-      { text: 'Contract review and approval', tag: 'legal' },
-      { text: 'Full sub-outsourcing chain mapped and documented', tag: 'risk' },
-      { text: 'External sub-vendor formally approved', tag: 'risk' },
-      { text: 'Concentration risk assessed across full chain', tag: 'risk' },
-      { text: 'Exit strategy documented — covers external sub-vendor failure', tag: 'risk' },
-      { text: 'Register of Information entry prepared — full chain', tag: 'ops' },
-      { text: 'Annual management report process set up', tag: 'risk' },
-      { text: 'Outsourcing Officer sign-off obtained', tag: 'risk' },
-      { text: 'BaFin intention notification prepared', tag: 'risk' },
-      { text: 'BaFin go-live notification prepared', tag: 'risk' }
-    ]
-  },
-
-  'result_material_non_cif': {
+  // ── CLASS 5 — MATERIAL OUTSOURCING, ICT, non-Critical Function ──
+  'result_class5': {
     bafin_required: true,
     title: 'MATERIAL OUTSOURCING — ICT, non-Critical Function',
     alert: { type: 'warning', text: 'Full MaRisk AT 9 requirements apply. DORA Art. 30(2) applies. Art. 30(3) enhanced clauses do not apply — non-CIF arrangement.' },
@@ -1327,24 +1292,25 @@ const results = {
     ]
   },
 
-  'result_non_material_ict': {
+  // ── CLASS 6 — NON-MATERIAL ICT SERVICE, non-Critical Function (Outsourcing + ICT) ──
+  'result_class6': {
     bafin_required: false,
-    title: 'NON-MATERIAL ICT SERVICE — non-Critical Function',
+    title: 'NON-MATERIAL ICT SERVICE — non-Critical Function (Outsourcing + ICT)',
     alert: { type: 'warning', text: 'DORA Art. 30(2) applies regardless of materiality. Register of Information entry required. Periodic classification review required.' },
     classifications: [
-      { type: 'marisk', label: 'MaRisk AT 9', value: 'N/A — not outsourcing' },
-      { type: 'dora', label: 'DORA', value: 'Art. 28(3), Art. 30(2), Art. 28(2), Art. 28(4)' },
-      { type: 'eba', label: 'EBA GL', value: 'N/A — not outsourcing' }
+      { type: 'marisk', label: 'MaRisk AT 9', value: 'Standard requirements' },
+      { type: 'dora', label: 'DORA', value: 'Art. 28(3), 30(2), 28(2), 28(4)' },
+      { type: 'eba', label: 'EBA GL', value: 'Standard due diligence' }
     ],
     implications: [
-      'DORA Art. 30(2) minimum contractual clauses required',
+      'Standard MaRisk outsourcing contract required',
+      'DORA Art. 30(2) minimum clauses required',
       'Register of Information entry required — Art. 28(3)',
-      'Substitutability assessment required — Art. 28(2)',
-      'Concentration risk assessment required — Art. 28(4)',
       'Sub-outsourcing must be contractually controlled',
-      'Periodic classification review required — if arrangement grows into outsourcing, re-classify immediately'
+      'Concentration risk assessment required',
+      'Periodic classification review required'
     ],
-    examples: ['Low-risk SaaS tools', 'Non-critical analytics platforms', 'Secondary IT support tools'],
+    examples: ['Non-critical SaaS with outsourcing component', 'Low-risk IT service the institution would do itself'],
     bafin: 'No BaFin notification required. Non-material ICT service is below the notification threshold. DORA Register of Information entry is required regardless of materiality. If classification changes, notification obligation arises immediately.',
     checklist: [
       { text: 'Contract review and approval', tag: 'legal' },
@@ -1356,6 +1322,110 @@ const results = {
     ]
   },
 
+  // ── IG1 — INTRA-GROUP, Material Outsourcing (non-ICT) ──
+  'result_ig1': {
+    bafin_required: true,
+    title: 'INTRA-GROUP — Material Outsourcing',
+    alert: { type: 'warning', text: 'Intra-group status does not exempt this arrangement from MaRisk AT 9 requirements. DORA institution-level obligations apply regardless.' },
+    classifications: [
+      { type: 'marisk', label: 'MaRisk AT 9', value: 'Material outsourcing intra-group — simplified due diligence permitted' },
+      { type: 'dora', label: 'DORA', value: 'Institution-level only' },
+      { type: 'eba', label: 'EBA GL', value: '_dynamic_' }
+    ],
+    implications: [
+      'Full MaRisk AT 9 requirements apply — simplified due diligence permitted',
+      'Intra-group SLA required in writing',
+      'No exit plan required — MaRisk AT 9.6 intra-group exemption applies',
+      'Sub-outsourcing must be contractually controlled',
+      'Concentration risk assessment required',
+      'Annual management report required'
+    ],
+    examples: ['Intra-group compliance function', 'Group internal audit', 'Intra-group credit analysis', 'Intra-group back-office operations', 'Group administrative support'],
+    bafin: 'Notification required. Intra-group status does not exempt material outsourcing from BaFin notification under § 25b KWG / MaRisk AT 9.2. Two notifications required — intention before contract signing and go-live when operational.',
+    checklist: [
+      { text: 'Contract review and approval', tag: 'legal' },
+      { text: 'Risk assessment completed and documented', tag: 'risk' },
+      { text: 'Sub-contractors reviewed and approved', tag: 'risk' },
+      { text: 'Concentration risk assessed', tag: 'risk' },
+      { text: 'Annual management report process set up', tag: 'risk' },
+      { text: 'Outsourcing Officer sign-off obtained', tag: 'risk' },
+      { text: 'BaFin intention notification prepared', tag: 'risk' },
+      { text: 'BaFin go-live notification prepared', tag: 'risk' }
+    ]
+  },
+
+  // ── IG2 — INTRA-GROUP, Material Outsourcing, ICT, Critical Function ──
+  'result_ig2': {
+    bafin_required: true,
+    title: 'INTRA-GROUP — MATERIAL OUTSOURCING, ICT, Critical Function',
+    alert: { type: 'warning', text: 'Intra-group status does not exempt this arrangement from DORA requirements. DORA Art. 28(8) exit strategy is required regardless of MaRisk intra-group exemption.' },
+    classifications: [
+      { type: 'marisk', label: 'MaRisk AT 9', value: 'Material outsourcing intra-group — simplified due diligence permitted' },
+      { type: 'dora', label: 'DORA', value: 'Art. 28(3), Art. 30(2), Art. 30(3), Art. 28(2), Art. 28(4), Art. 28(8)' },
+      { type: 'eba', label: 'EBA GL', value: 'Critical function intra-group — simplified due diligence permitted' }
+    ],
+    implications: [
+      'Full MaRisk AT 9 requirements apply — simplified due diligence permitted',
+      'Intra-group SLA required in writing',
+      'DORA Art. 30(2) and Art. 30(3) enhanced clauses apply',
+      'Register of Information entry required — Art. 28(3)',
+      'Exit strategy required under DORA Art. 28(8) — MaRisk intra-group exemption does not override DORA',
+      'Sub-outsourcing must be contractually controlled',
+      'Concentration risk assessment required',
+      'Annual management report required'
+    ],
+    examples: ['Group IT shared services supporting critical function', 'Intra-group payment hub', 'Group core banking platform'],
+    bafin: 'Notification required. Intra-group status does not exempt material outsourcing from BaFin notification under § 25b KWG / MaRisk AT 9.2. Two notifications required — intention before contract signing and go-live when operational.',
+    checklist: [
+      { text: 'Contract review and approval', tag: 'legal' },
+      { text: 'Risk assessment completed and documented', tag: 'risk' },
+      { text: 'Sub-contractors reviewed and approved', tag: 'risk' },
+      { text: 'Concentration risk assessed', tag: 'risk' },
+      { text: 'Exit strategy documented — DORA Art. 28(8)', tag: 'risk' },
+      { text: 'Register of Information entry prepared', tag: 'ops' },
+      { text: 'Annual management report process set up', tag: 'risk' },
+      { text: 'Outsourcing Officer sign-off obtained', tag: 'risk' },
+      { text: 'BaFin intention notification prepared', tag: 'risk' },
+      { text: 'BaFin go-live notification prepared', tag: 'risk' }
+    ]
+  },
+
+  // ── IG3 — INTRA-GROUP, Material Outsourcing, ICT, non-Critical Function ──
+  'result_ig3': {
+    bafin_required: true,
+    title: 'INTRA-GROUP — MATERIAL OUTSOURCING, ICT, non-Critical Function',
+    alert: { type: 'warning', text: 'Intra-group status does not exempt this arrangement from DORA requirements. MaRisk intra-group exemption applies — no exit plan required.' },
+    classifications: [
+      { type: 'marisk', label: 'MaRisk AT 9', value: 'Material outsourcing intra-group — simplified due diligence permitted' },
+      { type: 'dora', label: 'DORA', value: 'Art. 28(3), Art. 30(2), Art. 28(2), Art. 28(4)' },
+      { type: 'eba', label: 'EBA GL', value: 'Standard due diligence — simplified permitted for intra-group' }
+    ],
+    implications: [
+      'Full MaRisk AT 9 requirements apply — simplified due diligence permitted',
+      'Intra-group SLA required in writing',
+      'DORA Art. 30(2) minimum clauses apply',
+      'Register of Information entry required — Art. 28(3)',
+      'No exit plan required — MaRisk intra-group exemption applies. DORA Art. 28(8) does not apply — non-CIF.',
+      'Sub-outsourcing must be contractually controlled',
+      'Concentration risk assessment required',
+      'Annual management report required'
+    ],
+    examples: ['Group IT shared services non-critical', 'Intra-group infrastructure non-CIF', 'Group technology platform non-critical'],
+    bafin: 'Notification required. Intra-group status does not exempt material outsourcing from BaFin notification under § 25b KWG / MaRisk AT 9.2. Two notifications required — intention before contract signing and go-live when operational.',
+    checklist: [
+      { text: 'Contract review and approval', tag: 'legal' },
+      { text: 'Risk assessment completed and documented', tag: 'risk' },
+      { text: 'Sub-contractors reviewed and approved', tag: 'risk' },
+      { text: 'Concentration risk assessed', tag: 'risk' },
+      { text: 'Register of Information entry prepared', tag: 'ops' },
+      { text: 'Annual management report process set up', tag: 'risk' },
+      { text: 'Outsourcing Officer sign-off obtained', tag: 'risk' },
+      { text: 'BaFin intention notification prepared', tag: 'risk' },
+      { text: 'BaFin go-live notification prepared', tag: 'risk' }
+    ]
+  },
+
+  // ── EXIT NODE — External Procurement ──
   'result_external_procurement': {
     title: 'OTHER EXTERNAL PROCUREMENT — outside outsourcing scope',
     classifications: [
@@ -1380,6 +1450,7 @@ const results = {
     ]
   },
 
+  // ── EXIT NODE — External Procurement with Data Access ──
   'result_external_procurement_data': {
     title: 'EXTERNAL PROCUREMENT — Data Protection Obligations Apply',
     alert: { type: 'warning', text: 'This arrangement is outside the outsourcing scope but involves access to systems, customer data, or personal data. GDPR and data protection obligations apply.' },
@@ -1406,255 +1477,6 @@ const results = {
       { text: 'Confirm no regulated function is being delivered — if yes re-classify immediately', tag: 'ops' },
       { text: 'Confirm no ICT component exists — if yes re-classify via ICT path', tag: 'ops' }
     ]
-  },
-
-  'result_non_material_non_ict': {
-    bafin_required: false,
-    title: 'NON-MATERIAL OUTSOURCING — non-Critical Function',
-    alert: { type: 'warning', text: 'Standard MaRisk requirements apply. No BaFin notification required. Periodic classification review required.' },
-    classifications: [
-      { type: 'marisk', label: 'MaRisk AT 9', value: 'Non-material outsourcing — standard requirements' },
-      { type: 'dora', label: 'DORA', value: 'Institution-level only' },
-      { type: 'eba', label: 'EBA GL', value: 'Standard due diligence' }
-    ],
-    implications: [
-      'Standard MaRisk outsourcing contract required',
-      'EBA GL standard due diligence required',
-      'Sub-outsourcing must be contractually controlled',
-      'Periodic classification review required — if materiality changes, re-classify immediately'
-    ],
-    examples: ['Minor outsourced processes', 'Non-critical administrative services', 'Specialised non-critical services'],
-    bafin: 'No BaFin notification required. Non-material outsourcing is below the notification threshold under § 25b KWG. Document in internal outsourcing register. If classification changes to material, notification obligation arises immediately.',
-    checklist: [
-      { text: 'Contract review and approval', tag: 'legal' },
-      { text: 'Risk assessment completed and documented', tag: 'risk' },
-      { text: 'Sub-contractors reviewed and approved', tag: 'risk' },
-      { text: 'Periodic classification review scheduled', tag: 'risk' }
-    ]
-  },
-
-  'result_material_non_ict_cif': {
-    bafin_required: true,
-    title: 'MATERIAL OUTSOURCING — non-ICT, Critical Function',
-    alert: { type: 'warning', text: 'Full MaRisk AT 9 and EBA GL requirements apply. DORA ICT-specific requirements do not apply to this arrangement. Institution-level DORA obligations (Art. 6, Art. 28) apply regardless.' },
-    classifications: [
-      { type: 'marisk', label: 'MaRisk AT 9', value: 'Material outsourcing (non-ICT CIF)' },
-      { type: 'dora', label: 'DORA', value: 'DORA Art. 30 N/A — verify no ICT components exist' },
-      { type: 'eba', label: 'EBA GL', value: 'Critical/Important Function (non-ICT)' }
-    ],
-    implications: [
-      'Full MaRisk AT 9 contract requirements apply',
-      'Unrestricted audit rights must be agreed in the contract',
-      'Documented exit strategy required — tested and maintained',
-      'Annual management report on this arrangement',
-      'EBA GL/2019/02 CIF requirements apply in full',
-      'Concentration risk assessment required',
-      'No DORA Register of Information entry required unless an ICT component exists',
-      'Sub-outsourcing must be contractually controlled — vendor must notify the institution and obtain prior approval before engaging any sub-contractors'
-    ],
-    examples: ['Outsourced compliance function', 'External internal audit', 'Outsourced credit analysis'],
-    bafin: '<strong>Notification required.</strong> Material outsourcing of a non-ICT critical function is subject to BaFin notification under § 25b KWG / MaRisk AT 9.2. Two notifications required: intention to outsource (before contract signing) and go-live notification.',
-    timeline: 'Expect 6–10 weeks. Full MaRisk process applies. BaFin notification required before go-live.',
-    checklist: [
-      { text: 'Risk assessment completed and documented', tag: 'risk' },
-      { text: 'Full MaRisk AT 9 compliant contract drafted', tag: 'legal' },
-      { text: 'Audit rights agreed in contract', tag: 'legal' },
-      { text: 'Exit plan documented and approved', tag: 'ops' },
-      { text: 'Annual management report process set up', tag: 'risk' },
-      { text: 'EBA GL CIF requirements confirmed (non-ICT path)', tag: 'legal' },
-      { text: 'Outsourcing Officer sign-off obtained', tag: 'risk' },
-      { text: 'BaFin notification prepared — intention to outsource', tag: 'legal' },
-      { text: 'BaFin go-live notification prepared', tag: 'risk' },
-      { text: 'Sub-outsourcing clause included in contract — vendor approval required before any sub-contractor engagement', tag: 'legal' }
-    ]
-  },
-
-  'result_intragroup_non_ict': {
-    bafin_required: true,
-    title: 'INTRA-GROUP — MATERIAL OUTSOURCING, non-ICT, Critical Function',
-    alert: { type: 'warning', text: 'Intra-group status does not exempt this arrangement from MaRisk AT 9 requirements. DORA institution-level obligations apply regardless.' },
-    classifications: [
-      { type: 'marisk', label: 'MaRisk AT 9', value: 'Material outsourcing intra-group — simplified due diligence permitted' },
-      { type: 'dora', label: 'DORA', value: 'Institution-level only' },
-      { type: 'eba', label: 'EBA GL', value: 'Critical function intra-group — simplified due diligence permitted' }
-    ],
-    implications: [
-      'Full MaRisk AT 9 requirements apply — simplified due diligence permitted',
-      'Intra-group SLA required in writing',
-      'EBA GL full CIF requirements apply — simplified due diligence permitted',
-      'Sub-outsourcing must be contractually controlled',
-      'Concentration risk assessment required',
-      'Annual management report required',
-      'No exit plan required — MaRisk AT 9.6 intra-group exemption applies'
-    ],
-    examples: ['Intra-group compliance function', 'Group internal audit', 'Intra-group credit analysis'],
-    bafin: 'Notification required. Intra-group status does not exempt material outsourcing from BaFin notification under § 25b KWG / MaRisk AT 9.2. Two notifications required — intention before contract signing and go-live when operational.',
-    checklist: [
-      { text: 'Contract review and approval', tag: 'legal' },
-      { text: 'Risk assessment completed and documented', tag: 'risk' },
-      { text: 'Sub-contractors reviewed and approved', tag: 'risk' },
-      { text: 'Concentration risk assessed', tag: 'risk' },
-      { text: 'Annual management report process set up', tag: 'risk' },
-      { text: 'Outsourcing Officer sign-off obtained', tag: 'risk' },
-      { text: 'BaFin intention notification prepared', tag: 'risk' },
-      { text: 'BaFin go-live notification prepared', tag: 'risk' }
-    ]
-  },
-
-  'result_intragroup_non_ict_sub': {
-    bafin_required: true,
-    title: 'INTRA-GROUP WITH SUB-OUTSOURCING — non-ICT, Critical Function',
-    alert: { type: 'critical', text: 'Sub-outsourcing to an external vendor — you remain responsible for the entire chain. Institution-level DORA obligations apply regardless.' },
-    classifications: [
-      { type: 'marisk', label: 'MaRisk AT 9', value: 'Material outsourcing with sub-outsourcing' },
-      { type: 'dora', label: 'DORA', value: 'Institution-level only' },
-      { type: 'eba', label: 'EBA GL', value: 'Critical function with sub-contractor requirements' }
-    ],
-    implications: [
-      'Full sub-outsourcing chain must be mapped and documented',
-      'External sub-vendor must be formally approved before engagement',
-      'Sub-outsourcing clause required in intra-group contract',
-      'Equivalent contractual requirements must flow down to external sub-vendor',
-      'Exit plan must cover failure of external sub-vendor',
-      'Audit rights must extend to external sub-vendor',
-      'Concentration risk assessment across full chain required',
-      'Annual management report must cover full sub-outsourcing chain'
-    ],
-    examples: ['Intra-group compliance function using external specialist', 'Group audit entity using external firm'],
-    bafin: 'Notification required. Sub-outsourcing chain must be disclosed as part of BaFin notification under § 25b KWG / MaRisk AT 9.2. Two notifications required — intention before contract signing and go-live when operational.',
-    checklist: [
-      { text: 'Contract review and approval', tag: 'legal' },
-      { text: 'Full sub-outsourcing chain mapped and documented', tag: 'risk' },
-      { text: 'External sub-vendor formally approved', tag: 'risk' },
-      { text: 'Concentration risk assessed across full chain', tag: 'risk' },
-      { text: 'Exit plan documented — covers external sub-vendor failure', tag: 'risk' },
-      { text: 'Annual management report process set up', tag: 'risk' },
-      { text: 'Outsourcing Officer sign-off obtained', tag: 'risk' },
-      { text: 'BaFin intention notification prepared', tag: 'risk' },
-      { text: 'BaFin go-live notification prepared', tag: 'risk' }
-    ]
-  },
-
-  'result_material_non_ict_non_cif': {
-    bafin_required: true,
-    title: 'MATERIAL OUTSOURCING — non-Critical Function',
-    alert: { type: 'warning', text: 'Full MaRisk AT 9 requirements apply. EBA GL enhanced CIF requirements do not apply. DORA institution-level only.' },
-    classifications: [
-      { type: 'marisk', label: 'MaRisk AT 9', value: 'Material outsourcing — full requirements' },
-      { type: 'dora', label: 'DORA', value: 'Institution-level only' },
-      { type: 'eba', label: 'EBA GL', value: 'Standard due diligence' }
-    ],
-    implications: [
-      'Full MaRisk AT 9 contractual requirements apply',
-      'EBA GL standard due diligence required — enhanced CIF requirements do not apply',
-      'Sub-outsourcing must be contractually controlled',
-      'Concentration risk assessment required',
-      'Exit plan required — MaRisk AT 9.6',
-      'Annual management report required'
-    ],
-    examples: ['Outsourced back-office operations', 'Non-critical data entry', 'Administrative support functions', 'Facility management'],
-    bafin: 'Notification required. Material outsourcing must be notified to BaFin before go-live under § 25b KWG / MaRisk AT 9.2. Two notifications required — intention before contract signing and go-live when operational.',
-    checklist: [
-      { text: 'Contract review and approval', tag: 'legal' },
-      { text: 'Risk assessment completed and documented', tag: 'risk' },
-      { text: 'Sub-contractors reviewed and approved', tag: 'risk' },
-      { text: 'Concentration risk assessed', tag: 'risk' },
-      { text: 'Exit plan documented and approved', tag: 'risk' },
-      { text: 'Annual management report process set up', tag: 'risk' },
-      { text: 'Outsourcing Officer sign-off obtained', tag: 'risk' },
-      { text: 'BaFin intention notification prepared', tag: 'risk' },
-      { text: 'BaFin go-live notification prepared', tag: 'risk' }
-    ]
-  },
-
-  'result_material_non_ict_non_cif_intragroup': {
-    bafin_required: true,
-    title: 'INTRA-GROUP — MATERIAL OUTSOURCING, non-Critical Function',
-    alert: { type: 'warning', text: 'Intra-group status does not exempt this arrangement from MaRisk AT 9 requirements. Simplified due diligence permitted under EBA GL.' },
-    classifications: [
-      { type: 'marisk', label: 'MaRisk AT 9', value: 'Material outsourcing intra-group — simplified due diligence permitted' },
-      { type: 'dora', label: 'DORA', value: 'Institution-level only' },
-      { type: 'eba', label: 'EBA GL', value: 'Standard due diligence — simplified permitted for intra-group' }
-    ],
-    implications: [
-      'Full MaRisk AT 9 requirements apply — simplified due diligence permitted',
-      'Intra-group SLA required in writing',
-      'EBA GL standard due diligence required — simplified permitted',
-      'Sub-outsourcing must be contractually controlled',
-      'Concentration risk assessment required',
-      'Annual management report required',
-      'No exit plan required — MaRisk AT 9.6 intra-group exemption applies'
-    ],
-    examples: ['Intra-group back-office operations', 'Group administrative support', 'Intra-group non-critical services'],
-    bafin: 'Notification required. Intra-group status does not exempt material outsourcing from BaFin notification under § 25b KWG / MaRisk AT 9.2. Two notifications required — intention before contract signing and go-live when operational.',
-    checklist: [
-      { text: 'Contract review and approval', tag: 'legal' },
-      { text: 'Risk assessment completed and documented', tag: 'risk' },
-      { text: 'Sub-contractors reviewed and approved', tag: 'risk' },
-      { text: 'Concentration risk assessed', tag: 'risk' },
-      { text: 'Annual management report process set up', tag: 'risk' },
-      { text: 'Outsourcing Officer sign-off obtained', tag: 'risk' },
-      { text: 'BaFin intention notification prepared', tag: 'risk' },
-      { text: 'BaFin go-live notification prepared', tag: 'risk' }
-    ]
-  },
-
-  'result_material_non_ict_non_cif_intragroup_sub': {
-    bafin_required: true,
-    title: 'INTRA-GROUP WITH SUB-OUTSOURCING — non-ICT, non-Critical Function',
-    alert: { type: 'critical', text: 'Sub-outsourcing to an external vendor — you remain responsible for the entire chain. Institution-level DORA obligations apply regardless.' },
-    classifications: [
-      { type: 'marisk', label: 'MaRisk AT 9', value: 'Material outsourcing with sub-outsourcing' },
-      { type: 'dora', label: 'DORA', value: 'Institution-level only' },
-      { type: 'eba', label: 'EBA GL', value: 'Standard due diligence with sub-contractor requirements' }
-    ],
-    implications: [
-      'Full sub-outsourcing chain must be mapped and documented',
-      'External sub-vendor must be formally approved before engagement',
-      'Sub-outsourcing clause required in intra-group contract',
-      'Equivalent contractual requirements must flow down to external sub-vendor',
-      'Exit plan must cover failure of external sub-vendor',
-      'Audit rights must extend to external sub-vendor',
-      'Concentration risk assessment across full chain required',
-      'Annual management report must cover full sub-outsourcing chain'
-    ],
-    examples: ['Intra-group back-office using external processor', 'Group administrative function with external sub-vendor'],
-    bafin: 'Notification required. Sub-outsourcing chain must be disclosed as part of BaFin notification under § 25b KWG / MaRisk AT 9.2. Two notifications required — intention before contract signing and go-live when operational.',
-    checklist: [
-      { text: 'Contract review and approval', tag: 'legal' },
-      { text: 'Full sub-outsourcing chain mapped and documented', tag: 'risk' },
-      { text: 'External sub-vendor formally approved', tag: 'risk' },
-      { text: 'Concentration risk assessed across full chain', tag: 'risk' },
-      { text: 'Exit plan documented — covers external sub-vendor failure', tag: 'risk' },
-      { text: 'Annual management report process set up', tag: 'risk' },
-      { text: 'Outsourcing Officer sign-off obtained', tag: 'risk' },
-      { text: 'BaFin intention notification prepared', tag: 'risk' },
-      { text: 'BaFin go-live notification prepared', tag: 'risk' }
-    ]
-  },
-
-  'result_non_material_non_ict_intragroup': {
-    bafin_required: false,
-    title: 'NON-MATERIAL OUTSOURCING — intra-group, non-ICT',
-    alert: { type: 'warning', text: 'Standard MaRisk requirements apply. No BaFin notification required. Periodic classification review required.' },
-    classifications: [
-      { type: 'marisk', label: 'MaRisk AT 9', value: 'Non-material outsourcing intra-group' },
-      { type: 'dora', label: 'DORA', value: 'Institution-level only' },
-      { type: 'eba', label: 'EBA GL', value: 'Standard due diligence — simplified permitted for intra-group' }
-    ],
-    implications: [
-      'Standard intra-group contract required',
-      'EBA GL simplified due diligence permitted for intra-group',
-      'Periodic classification review required — if materiality changes, re-classify immediately',
-      'Institution-level DORA obligations apply regardless'
-    ],
-    examples: ['Minor intra-group services', 'Non-critical group administrative functions'],
-    bafin: 'No BaFin notification required. Non-material outsourcing is below the notification threshold under § 25b KWG. Document in internal outsourcing register.',
-    checklist: [
-      { text: 'Contract review and approval', tag: 'legal' },
-      { text: 'Risk assessment completed and documented', tag: 'risk' },
-      { text: 'Periodic classification review scheduled', tag: 'risk' }
-    ]
   }
 };
 
@@ -1664,6 +1486,9 @@ let currentNode = null;
 let arrangementType = null; // 'new' or 'reassess'
 let materialityChanged = true; // true/false — only for reassess path; defaults to true (BaFin shown unless explicitly no change)
 let _ctppProvider = false;
+let _subOutsourcing = false;
+let _isIntragroup = false;
+let _isCIF = false;
 let nonEuProvider = false; // true if ICT CIF external provider is outside the EU
 let isReassessment = false; // true if user selected Reassessment path
 let checkboxCounter = 0;
@@ -1902,11 +1727,43 @@ function renderQuestion(container, node) {
 }
 
 function renderResult(container, result) {
+  // Deep-clone result for dynamic modifications
+  const r = JSON.parse(JSON.stringify(result));
 
-  const alertHtml = result.alert ? `
-    <div class="alert alert-${result.alert.type}">
-      <div class="alert-icon">${result.alert.type === 'critical' ? '⚠' : '!'}</div>
-      <div>${result.alert.text}</div>
+  // Dynamic EBA GL + implications for result_class1
+  if (currentNode === 'result_class1') {
+    const eba = r.classifications.find(c => c.type === 'eba');
+    if (_isCIF) {
+      eba.value = 'Critical/Important Function — enhanced requirements';
+      r.implications.push('EBA GL full CIF due diligence required');
+      r.implications.push('EBA GL enhanced contractual requirements for CIF apply');
+    } else {
+      eba.value = 'Standard due diligence';
+      r.implications.push('EBA GL standard due diligence required');
+    }
+  }
+
+  // Dynamic EBA GL + implications for result_ig1
+  if (currentNode === 'result_ig1') {
+    const eba = r.classifications.find(c => c.type === 'eba');
+    if (_isCIF) {
+      eba.value = 'Critical/Important Function intra-group — simplified due diligence permitted';
+      r.implications.push('EBA GL full CIF requirements apply — simplified due diligence permitted');
+    } else {
+      eba.value = 'Standard due diligence — simplified permitted for intra-group';
+      r.implications.push('EBA GL standard due diligence required — simplified permitted');
+    }
+  }
+
+  // Dynamic intragroup implication for result_class2
+  if (currentNode === 'result_class2' && _isIntragroup) {
+    r.implications.push('Simplified due diligence permitted — intra-group arrangement');
+  }
+
+  const alertHtml = r.alert ? `
+    <div class="alert alert-${r.alert.type}">
+      <div class="alert-icon">${r.alert.type === 'critical' ? '⚠' : '!'}</div>
+      <div>${r.alert.text}</div>
     </div>` : '';
 
   const nonEuHtml = nonEuProvider ? `
@@ -1918,7 +1775,7 @@ function renderResult(container, result) {
       </div>
     </div>` : '';
 
-  const ctppHtml = (result.classifications && result.classifications.some(c => c.type === 'dora' && c.value.includes('Art.'))) && window._ctppProvider ? `
+  const ctppHtml = (r.classifications && r.classifications.some(c => c.type === 'dora' && c.value.includes('Art.'))) && window._ctppProvider ? `
     <div class="ctpp-flag">
       <div class="ctpp-flag-icon">⚡</div>
       <div class="ctpp-flag-body">
@@ -1935,16 +1792,38 @@ function renderResult(container, result) {
           </ul>
         </div>
       </div>
-    </div>` : result.ctpp ? `
+    </div>` : r.ctpp ? `
     <div class="ctpp-flag">
       <div class="ctpp-flag-icon">⚡</div>
       <div class="ctpp-flag-body">
         <div class="ctpp-flag-title">CTPP — Concentration Risk Check Required</div>
-        <div class="ctpp-flag-text">${result.ctpp}</div>
+        <div class="ctpp-flag-text">${r.ctpp}</div>
       </div>
     </div>` : '';
 
-  const bafinHtml = (isReassessment && materialityChanged === false) ? '' : getBafinHtml(result);
+  const subOutsourcingHtml = (_subOutsourcing && r.bafin_required) ? `
+    <div class="ctpp-flag">
+      <div class="ctpp-flag-icon">⛓</div>
+      <div class="ctpp-flag-body">
+        <div class="ctpp-flag-title">SUB-OUTSOURCING — Additional Requirements Apply</div>
+        <div class="ctpp-flag-text">
+          <ul style="margin-top:8px;padding-left:16px;display:flex;flex-direction:column;gap:4px;">
+            <li>Full sub-outsourcing chain must be mapped and documented</li>
+            <li>External sub-vendor must be formally approved before engagement</li>
+            <li>Sub-outsourcing clause required in the primary contract</li>
+            <li>Equivalent contractual requirements must flow down to sub-vendor</li>
+            <li>Exit plan must cover failure of the external sub-vendor</li>
+            <li>Audit rights must extend to the external sub-vendor</li>
+            <li>Register of Information must show the full sub-outsourcing chain</li>
+            <li>Concentration risk assessment must cover the full chain</li>
+            <li>Annual management report must cover the full sub-outsourcing chain</li>
+            <li>BaFin notification must disclose the sub-outsourcing chain</li>
+          </ul>
+        </div>
+      </div>
+    </div>` : '';
+
+  const bafinHtml = (isReassessment && materialityChanged === false) ? '' : getBafinHtml(r);
 
   const reassessmentChecklist = [
     { text: 'Previous classification reviewed and confirmed as still valid', tag: 'ops' },
@@ -1958,7 +1837,7 @@ function renderResult(container, result) {
     { text: 'Outsourcing Officer sign-off on reassessment outcome obtained', tag: 'risk' },
     { text: 'No BaFin notification required — confirmed and documented in writing', tag: 'risk' }
   ];
-  const activeChecklist = (isReassessment && materialityChanged === false) ? reassessmentChecklist : result.checklist;
+  const activeChecklist = (isReassessment && materialityChanged === false) ? reassessmentChecklist : r.checklist;
   const checklistTitle = (isReassessment && materialityChanged === false) ? 'REASSESSMENT CHECKLIST' : 'What to prepare before contracting';
 
   const checklistHtml = activeChecklist ? `
@@ -1980,13 +1859,14 @@ function renderResult(container, result) {
   container.innerHTML = `
     <div class="result-card">
       <div class="result-title">✓ Classification determined</div>
-      <h2 style="font-size:20px;font-weight:700;color:#fff;margin-bottom:20px;">${result.title}</h2>
+      <h2 style="font-size:20px;font-weight:700;color:#fff;margin-bottom:20px;">${r.title}</h2>
       ${alertHtml}
       ${nonEuHtml}
       ${ctppHtml}
+      ${subOutsourcingHtml}
       ${bafinHtml}
       <div class="classification-grid">
-        ${result.classifications.map(c => `
+        ${r.classifications.map(c => `
           <div class="class-badge ${c.type}">
             <div class="class-badge-label">${c.label}</div>
             <div class="class-badge-value">${c.value}</div>
@@ -1995,14 +1875,14 @@ function renderResult(container, result) {
       </div>
       <div class="implications-title">What this means for you</div>
       <ul class="implication-list">
-        ${result.implications.map(i => `<li>${i}</li>`).join('')}
+        ${r.implications.map(i => `<li>${i}</li>`).join('')}
       </ul>
       ${checklistHtml}
-      ${result.examples ? `
+      ${r.examples ? `
         <div class="examples-box">
           <div class="examples-title">Examples</div>
           <div class="examples-list">
-            ${result.examples.map(e => `<span class="example-tag">${e}</span>`).join('')}
+            ${r.examples.map(e => `<span class="example-tag">${e}</span>`).join('')}
           </div>
         </div>` : ''}
       <div class="restart-area">
@@ -2020,6 +1900,9 @@ function answer(nextId, label, action) {
   if (action === 'setMaterialityTrue') materialityChanged = true;
   if (action === 'setMaterialityFalse') materialityChanged = false;
   if (action === 'setCTPP') window._ctppProvider = true;
+  if (action === 'setSubOutsourcing') _subOutsourcing = true;
+  if (action === 'setIntragroup') _isIntragroup = true;
+  if (action === 'setCIF') _isCIF = true;
   history.push({ node: currentNode, answerLabel: label });
   currentNode = nextId;
   render();
@@ -2034,6 +1917,9 @@ function goBack() {
     materialityChanged = true;
     nonEuProvider = false;
     window._ctppProvider = false;
+    _subOutsourcing = false;
+    _isIntragroup = false;
+    _isCIF = false;
     render();
     window.scrollTo({ top: 0, behavior: 'smooth' });
     return;
@@ -2045,6 +1931,9 @@ function goBack() {
   if (prev.node === 'q_reassessment_materiality_change') materialityChanged = true;
   if (prev.node === 'q_non_eu_provider') nonEuProvider = false;
   if (prev.node === 'q3e_cloud_ctpp_check' || prev.node === 'q6_ctpp') window._ctppProvider = false;
+  if (prev.node === 'q6_ctpp_intra' || prev.node === 'q_non_ict_intragroup_sub' || prev.node === 'q_non_ict_non_cif_intragroup_sub' || prev.node === 'q3d_cloud_intra_sub') _subOutsourcing = false;
+  if (prev.node === 'q5_intragroup' || prev.node === 'q3b_cloud_ctpp' || prev.node === 'q_non_ict_cif_intragroup' || prev.node === 'q_non_ict_material_non_cif_intragroup' || prev.node === 'q_non_ict_non_material_intragroup' || prev.node === 'q_ict_intragroup_noncif') _isIntragroup = false;
+  if (prev.node === 'q_non_ict_cif' || prev.node === 'q4_critical_func' || prev.node === 'q3_cloud_cif') _isCIF = false;
   currentNode = prev.node;
   render();
   window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -2058,6 +1947,9 @@ function restart() {
   materialityChanged = true;
   nonEuProvider = false;
   window._ctppProvider = false;
+  _subOutsourcing = false;
+  _isIntragroup = false;
+  _isCIF = false;
   render();
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
