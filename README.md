@@ -1,4 +1,4 @@
-# 🏦 DORA / MaRisk Outsourcing Calculator
+# 🏦 DORA / MaRisk  Calculator
 
 **An interactive decision tree for classifying external and intra-group services under European financial services regulation.**
 
