@@ -1995,7 +1995,7 @@ function renderResult(container, result) {
       </div>
       <div class="implications-title">What this means for you</div>
       <ul class="implication-list">
-        ${[...result.implications, ...(result.bafin_required ? ['Assess concentration risk — consider whether the same provider is used across multiple functions or entities within the group. Document findings in the annual management report.'] : [])].map(i => `<li>${i}</li>`).join('')}
+        ${result.implications.map(i => `<li>${i}</li>`).join('')}
       </ul>
       ${checklistHtml}
       ${result.examples ? `
