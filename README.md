@@ -12,7 +12,7 @@ Classifying an outsourcing or ICT arrangement under European financial services 
 
 This tool is a **pre-risk assessment shortcut**: answer a series of guided questions, and the calculator outputs the correct regulatory classification with applicable obligations, flags, and a structured checklist — no risk background required.
 
-This tool does not constitute legal, regulatory, or compliance advice. Always consult your legal and compliance team before making outsourcing decisions
+**This tool does not constitute legal, regulatory, or compliance advice. Always consult your legal and compliance team before making outsourcing decisions**!!!
 
 ---
 
