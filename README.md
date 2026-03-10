@@ -133,4 +133,4 @@ Full classification reference with regulatory framework mapping and checklists:
 
 ## Built by
 
-[Jelena Tomasevic](https://www.linkedin.com/in/) — Risk & Compliance | Vibe coded with curiosity and caffeine.
+[Jelena Tanovic Milosavljevic] https://www.linkedin.com/in/jelena-tanovic-milosavljevic/ — Outsourcing Manager| Vibe coded with curiosity and caffeine.
